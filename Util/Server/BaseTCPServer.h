@@ -16,4 +16,13 @@ public:
     void shutdown();
 };
 
+
+
+//INLINE FUNCTIONS
+
+inline void BaseTCPServer::shutdown(){
+    baseTCPServerActive = false;
+    ServerSkeleton::shutdown();
+}
+
 #endif

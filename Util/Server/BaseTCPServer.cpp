@@ -15,8 +15,3 @@ void BaseTCPServer::serve(){
         processRequest(c);
     }
 }
-
-void BaseTCPServer::shutdown(){
-    baseTCPServerActive = false;
-    ServerSkeleton::shutdown();
-}

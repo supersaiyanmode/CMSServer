@@ -1,4 +1,4 @@
-#ifdef THREADING_TCP_SERVER_UNIT_TEST
+#if defined(THREADING_TCP_SERVER_UNIT_TEST) || defined(ENABLE_ALL_TESTS)
 #include <vector>
 #include <cstdlib>
 #include <ctime>

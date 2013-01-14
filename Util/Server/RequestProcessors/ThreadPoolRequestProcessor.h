@@ -21,4 +21,12 @@ protected:
 };
 
 
+//INLINE FUNCTIONS
+
+inline void ThreadPoolRequestProcessor::shutdown(){
+    if (active){
+        active = false;
+        delete threadPool;
+    }
+}
 #endif

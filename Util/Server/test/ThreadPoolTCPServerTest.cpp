@@ -1,4 +1,4 @@
-#ifdef THREAD_POOL_TCP_SERVER_UNIT_TEST
+#if defined(THREAD_POOL_TCP_SERVER_UNIT_TEST) || defined(ENABLE_ALL_TESTS)
 #include <vector>
 #include <cstdlib>
 #include <ctime>

@@ -15,10 +15,3 @@ ThreadPoolRequestProcessor::~ThreadPoolRequestProcessor(){
     if (active)
         shutdown();
 }
-
-void ThreadPoolRequestProcessor::shutdown(){
-    if (active){
-        active = false;
-        delete threadPool;
-    }
-}

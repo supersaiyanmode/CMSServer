@@ -22,4 +22,19 @@ protected:
     virtual void onIncomingConnection(Connection)=0;
 };
 
+//INLINE FUNCTIONS
+
+inline void ThreadingTCPServer::initialise(){
+    active = true;
+    BaseTCPServer::initialise();
+}
+
+inline void ThreadingTCPServer::shutdown(){
+    if (active) {
+        BaseTCPServer::shutdown();
+        ThreadingRequestProcessor::shutdown();
+        active = false;
+    }
+}
+
 #endif

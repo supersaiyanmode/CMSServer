@@ -19,4 +19,15 @@ public:
     void shutdown();
 };
 
+
+
+//INLINE FUNCTIONS
+inline Connection ServerSkeleton::accept(){
+    return serverSocket.accept();
+}
+
+inline void ServerSkeleton::shutdown(){
+    serverSocket.close();
+}
+
 #endif

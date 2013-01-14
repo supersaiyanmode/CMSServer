@@ -15,12 +15,27 @@ public:
     ThreadPoolTCPServer(int, int=10,int=1024);
     virtual ~ThreadPoolTCPServer();
     
-    void initialise();
-    void shutdown();
+    virtual void initialise();
+    virtual void shutdown();
     
 protected:
     virtual void onIncomingConnection(Connection)=0;
 };
+
+
+
+//INLINE FUNCTIONS
+inline void ThreadPoolTCPServer::initialise(){
+    BaseTCPServer::initialise();
+}
+
+inline void ThreadPoolTCPServer::shutdown(){
+    if (active){
+        BaseTCPServer::shutdown();
+        ThreadPoolRequestProcessor::shutdown();
+        active = false;
+    }
+}
 
 
 #endif
