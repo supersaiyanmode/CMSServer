@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include "Connection.h"
 #include "TCPServerSocket.h"
 #include "TCPClientSocket.h"
@@ -14,7 +16,6 @@ Connection::Connection(TCPSocket s): socket(s) {
     ::getsockname(sock, (sockaddr*)&local, &localLen);
     ::inet_ntop(AF_INET, &local.sin_addr.s_addr, localStr, 128);
     localPort = htons(local.sin_port);
-    localEndPoint = std::make_pair(localStr, localPort);
     
     //remote
     int remotePort;
@@ -22,7 +23,17 @@ Connection::Connection(TCPSocket s): socket(s) {
     ::getpeername(sock, (sockaddr*)&remote, &remoteLen);
     ::inet_ntop(AF_INET, &remote.sin_addr.s_addr, remoteStr, 128);
     remotePort = ntohs(remote.sin_port);
+    
+    
+    std::stringstream ss1, ss2;
+    
+    localEndPoint = std::make_pair(localStr, localPort);
+    ss1<<localEndPoint.first<<":"<<localEndPoint.second;
+    localAddressStr_ = ss1.str();
+    
     remoteEndPoint = std::make_pair(remoteStr, remotePort);
+    ss2<<localEndPoint.first<<":"<<localEndPoint.second;
+    remoteAddressStr_ = ss2.str();
 }
 
 Connection::Connection(): socket(1,0,0){
@@ -31,13 +42,6 @@ Connection::Connection(): socket(1,0,0){
 
 Connection::~Connection() {
     
-}
-
-std::pair<std::string, int> Connection::getLocalAddress() {
-    return localEndPoint;
-}
-std::pair<std::string, int> Connection::getRemoteAddress(){
-    return remoteEndPoint;
 }
 
 Connection Connection::open(const std::string& remoteStr, int port){
@@ -77,6 +81,7 @@ int Connection::closeReading(){
 int Connection::closeWriting(){
     return socket.closeWriting();
 }
+
 int Connection::close(){
     return socket.close();
 }
