@@ -78,7 +78,6 @@ void Socket::initialise(){
     
 }
 
-
 int Socket::write(const char* buf, int len){
     if (!writeActive)
         throw SocketException("Socket not ready for writing");

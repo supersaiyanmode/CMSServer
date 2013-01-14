@@ -53,6 +53,19 @@ public:
     virtual int closeWriting();
     virtual int close();
     
+    bool readable() const;
+    bool writable() const;
+    
 };
+
+
+//INLINE FUNCTIONS
+inline bool Socket::readable() const {
+    return readActive;
+}
+
+inline bool Socket::writable() const {
+    return writeActive;
+}
 
 #endif
