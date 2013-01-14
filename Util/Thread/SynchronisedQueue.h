@@ -11,7 +11,7 @@
 
 #include "Mutex.h"
 #include "Condition.h"
-#include "../Time/TimeSpan.h"
+#include "../Time/Time.h"
 
 template <typename T>
 class SynchronisedQueue {
@@ -31,7 +31,7 @@ class SynchronisedQueue {
         notFull = Condition::createCondition(queueLock);
     }
 public:
-    static SynchronisedQueue* createSynchronisedQueue(int max=10){
+    static SynchronisedQueue* createSynchronisedQueue(int max=0){
         return new SynchronisedQueue(max);
     }
     
@@ -54,12 +54,12 @@ public:
         queueLock->release();
     }
     
-    bool timedPush(const T& obj, int usec){
+    bool timedPush(const T& obj, unsigned int usec){
         if (maxQueueSize == 0){
             push(obj);
             return true;
         }
-        PLATFORM_TIMESPAN absTimeout = TimeSpan::getAbsoluteTimeout(usec);
+        PLATFORM_TIMESPAN absTimeout = Time::after(usec);
         int ret = 0;
         
         queueLock->acquire();
@@ -89,8 +89,8 @@ public:
         return obj;
     }
     
-    bool timedPop(T& obj, int usec){
-        PLATFORM_TIMESPAN absTimeout = TimeSpan::getAbsoluteTimeout(usec);
+    bool timedPop(T& obj, unsigned int usec){
+        PLATFORM_TIMESPAN absTimeout = Time::after(usec);
         int ret = 0;
         
         queueLock->acquire();
@@ -109,11 +109,11 @@ public:
         return true;
     }
     
-    operator bool() {
+    operator bool() const {
         return isActive();
     }
     
-    bool isActive(){
+    bool isActive() const{
         return active;
     }
     

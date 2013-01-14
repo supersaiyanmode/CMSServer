@@ -1,4 +1,4 @@
-#ifdef PRODUCER_CONSUMER_TEST
+#if defined(PRODUCER_CONSUMER_TEST) || defined(ENABLE_ALL_TESTS)
 #include <iostream>
 #include <vector>
 
@@ -31,7 +31,7 @@ public:
         while (active){
             if (mainQueue->timedPush(prod, 50000)){
                 prod++;
-                tlog("Produced: "<<prod)
+                tlog("Produced: "<<prod);
             } else {
                 tlog("Full. Can't produce!");
             }
@@ -40,7 +40,7 @@ public:
     }
     
     void consume(int sleep){
-        tlog("Started to consume")
+        tlog("Started to consume");
         while (active){
             int obj;
             if (mainQueue->timedPop(obj, 50000)){

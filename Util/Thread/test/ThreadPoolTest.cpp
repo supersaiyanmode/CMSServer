@@ -1,4 +1,4 @@
-#ifdef THREAD_POOL_TEST
+#if defined(THREAD_POOL_TEST) || defined(ENABLE_ALL_TESTS)
 #include "../ThreadPool.h"
 #include "../ThreadLogger.h"
 

@@ -1,4 +1,4 @@
-#if THREADING_TEST
+#if defined(THREADING_TEST) || defined(ENABLE_ALL_TESTS)
 #include <iostream>
 #include <vector>
 
