@@ -16,6 +16,9 @@ public:
     
     virtual int closeReading()=0;
     virtual int closeWriting()=0;
+    
+    virtual bool writable() const = 0;
+    virtual bool readable() const = 0;
 };
 
 #endif
