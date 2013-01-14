@@ -13,4 +13,12 @@ public:
 
 };
 
+
+
+//INLINE FUNCTIONS
+
+inline void TCPSocket::initialise(){
+    
+}
+
 #endif

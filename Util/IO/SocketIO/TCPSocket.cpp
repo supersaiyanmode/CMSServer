@@ -16,8 +16,3 @@ TCPSocket& TCPSocket::operator=(const TCPSocket& other){
 TCPSocket::~TCPSocket(){
     
 }
-
-
-void TCPSocket::initialise(){
-    
-}
