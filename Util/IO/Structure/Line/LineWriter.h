@@ -13,6 +13,16 @@ public:
     LineWriter(InputOutputCapable&, std::string="\n");
     int writeLine(const std::string&);
     int close();
+    bool writable() const;
 };
 
+
+//INLINE FUNCTION
+inline int LineWriter::close(){
+    return device.closeWriting();
+}
+
+inline bool LineWriter::writable() const {
+    return device.writable();
+}
 #endif

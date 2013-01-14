@@ -6,6 +6,9 @@ LineReader::LineReader(InputOutputCapable& dv, std::string d):
 }
 
 std::string LineReader::readLine(){
+    if (!readable())
+        return "";
+    
     size_t pos;
     if ((pos=backBuffer.find(delim)) != std::string::npos){ //we already have some string
         std::string ret;
@@ -14,7 +17,6 @@ std::string LineReader::readLine(){
         else
             ret = backBuffer.substr(0, pos);
         backBuffer.erase(0, ret.length() + delim.length());
-        std::cout<<ret<<std::endl;
         return ret;
     } else {
         int readRes;
@@ -43,8 +45,4 @@ std::string LineReader::readLine(){
         backBuffer.erase(0, ret.length() + delim.length());
         return ret;
     }
-}
-
-int LineReader::close(){
-    return device.closeReading();
 }
