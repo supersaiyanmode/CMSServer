@@ -11,24 +11,57 @@
 
 #include <map>
 
+struct ACKWaiter {
+    Mutex* mutex;
+    Condition* condition;
+};
+
+struct CMSMessageSendData {
+    GenericCMSMessage message;
+    Time originalSentTime;
+    Time lastSentTime;
+    UniqueID id;
+};
+
 class CMSServerConnection {
-    bool readerThreadActive, connectionActive;
+    //General Stuff
+    bool connectionActive;
     Connection conn;
-    
     std::map<UniqueID, CMSClient*> clients;
+    Mutex *clientsMapLock;
+    bool closed;
     
-    std::map<UniqueID, GenericCMSMessage> pendingAcknowledgements;
-    std::map<UniqueID, Condition*> pendingRegistrationsConditions;
-    std::map<UniqueID, Mutex*> pendingRegistrationsMutexes;
     
-    Thread<CMSServerConnection, int>* readerThread;
-    Mutex *writeLock, *pendingAcknowledgementsMapLock, *clientsMapLock;
+    //Incoming stuff
+    bool readerThreadActive;
+    Thread<CMSServerConnection, int> *readerThread;
+    
+    
+    //Outgoing stuff
+    Mutex *writeLock;
+    
+    
+    //Resend stuff
+    /* not using a map, vector instead. Erase all the items before last received ACK */
+    std::vector<CMSMessageSendData> sentData; 
+    Mutex *sentDataLock;
+    bool resendThreadActive;
+    Thread<CMSServerConnection, int> *resendThread;
+    
+    
+    //Wait stuff
+    std::map<UniqueID, ACKWaiter> waiters;
+    Mutex *waitersLock;
+    
     
     
     CMSServerConnection(const std::string&, int);
     ~CMSServerConnection();
     
     bool doRegister(CMSClient*, bool);
+    void resendProcess(int);
+    
+    bool write_(GenericCMSMessage&, bool);
 public:
     static CMSServerConnection* createCMSServerConnection(const std::string&, int);
     
@@ -36,6 +69,7 @@ public:
     bool writable() const;
     
     UniqueID write(GenericCMSMessage&);
+    bool writeWithAck(GenericCMSMessage&);
     
     void close();
     
