@@ -8,7 +8,7 @@ class CMSClient {
     UniqueID clientID;
 public:
     CMSClient();
-    ~CMSClient();
+    virtual ~CMSClient();
     
     UniqueID id() const;
     
