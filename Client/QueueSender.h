@@ -12,13 +12,6 @@ class QueueSender : public CMSClient {
     CMSServerConnection& conn;
     std::string destination;
     
-    Mutex *sendLock, *ackLock;
-    Condition *ackArrived;
-    
-    GenericCMSMessage response;
-    UniqueID waitID;
-    int waitStatus;
-    
     QueueSender(const QueueSender&);
     QueueSender& operator=(const QueueSender&);
     
