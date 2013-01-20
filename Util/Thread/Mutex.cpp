@@ -43,8 +43,6 @@ void Mutex::release(){
 void Mutex::destroy(){
     if (destroyed)
         return;
-    if (acquired)
-        release();
 #ifdef WIN32
 
 #else
