@@ -101,5 +101,10 @@ inline bool CMSServerConnection::unregisterClient(CMSClient* receiver) {
     return doRegister(receiver, false);
 }
 
+inline CMSServerConnection* CMSServerConnection::createCMSServerConnection(
+        const std::string& a, int b){
+    return new CMSServerConnection(a,b);
+}
+
 
 #endif
