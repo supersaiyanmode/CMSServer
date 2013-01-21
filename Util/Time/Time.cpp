@@ -11,6 +11,10 @@ Time::Time() {
 #endif
 }
 
+Time::~Time() {
+    
+}
+
 
 PLATFORM_TIMESPAN Time::after(unsigned int usec){
 #ifdef WIN32
