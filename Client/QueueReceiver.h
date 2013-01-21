@@ -6,7 +6,7 @@
 
 class QueueReceiver : public CMSClient {
     CMSServerConnection& conn;
-    std::string destination;
+    std::string cmsDestination;
     
     
     QueueReceiver(const QueueReceiver&);
@@ -14,10 +14,18 @@ class QueueReceiver : public CMSClient {
 protected:
     QueueReceiver(CMSServerConnection&, const std::string&);
     virtual ~QueueReceiver();
+
+	const std::string& destination() const;
     
 public:
     virtual void onMessage(GenericCMSMessage&)=0;
 };
     
+
+//INLINE FUNCTIONS
+
+inline const std::string& QueueReceiver::destination() const {
+	return cmsDestination;
+}
 
 #endif

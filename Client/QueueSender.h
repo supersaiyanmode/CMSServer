@@ -1,14 +1,13 @@
 #ifndef QUEUE_SENDER_H
 #define QUEUE_SENDER_H
 
-#include "CMSClient.h"
 #include "CMSServerConnection.h"
 #include "../Protocol/CMSMessage/Header/CMSHeaderSet.h"
 #include "../Protocol/CMSMessage/GenericCMSMessage.h"
 #include "../Util/Thread/Mutex.h"
 #include "../Util/Thread/Condition.h"
 
-class QueueSender : public CMSClient {
+class QueueSender {
     CMSServerConnection& conn;
     std::string destination;
     

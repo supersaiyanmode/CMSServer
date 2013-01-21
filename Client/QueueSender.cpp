@@ -3,26 +3,25 @@
 #include "../Util/Thread/ThreadLogger.h"
 
 namespace {
-    RegexMatcher queueDestinationRE("^([a-zA-Z][a-zA-Z0-9]*\\.)*(([a-zA-Z][a-zA-Z0-9]*)|>)$");
+    RegexMatcher queueDestinationRE("^[A-Za-z]+$");
 }
 
 QueueSender::QueueSender(CMSServerConnection& c, const std::string& d) :
             conn(c), destination(d){
     
-    if (!queueDestinationRE.search(d))
+    if (!queueDestinationRE.search(d)){
+        tlog("Error: Not a valid queue name!");
         throw "Not a valid Queue name";
+    }
     
-    sendLock = Mutex::createMutex();
 }
 
 QueueSender::~QueueSender() {
-    conn.unregisterClient(this);
-    delete sendLock;
+
 }
 
 bool QueueSender::send(const CMSHeaderSet& custom, const std::string& message) {
     CMSHeaderSet standard;
-    standard["receiver-id"] = CMSClient::id();
     standard["direction"] = "forward";
     standard["category"] = GenericCMSMessage::CMSMessageTypeToStr(GenericCMSMessage::Queue);
     GenericCMSMessage out(standard, custom, message);

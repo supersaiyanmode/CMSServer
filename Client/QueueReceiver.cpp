@@ -3,17 +3,17 @@
 #include "../Util/Thread/ThreadLogger.h"
 
 namespace {
-    RegexMatcher queueDestinationRE("^([a-zA-Z][a-zA-Z0-9]*\\.)*(([a-zA-Z][a-zA-Z0-9]*)|>)$");
+    RegexMatcher queueDestinationRE("^[A-Za-z]+$");
 }
 
 
 
 QueueReceiver::QueueReceiver(CMSServerConnection& c, const std::string& d):
-                    conn(c), destination(d){
-    if (!queueDestinationRE.search(destination))
+                    conn(c), cmsDestination(d){
+    if (!queueDestinationRE.search(cmsDestination))
         throw "Not a valid Queue name";
     
-    tlog("Registering QueueSender..");
+    tlog("Registering QueueReceiver..");
     conn.registerClient(this);
     tlog("Registration done!");
 }
