@@ -5,7 +5,15 @@
 #include "Core/MessageProcessor.h"
 
 class CMSServer : public ClientHandler {
-	
+    bool destroyed;
+	MessageProcessor mp;
+public:
+    CMSServer(int);
+    virtual ~CMSServer();
+    
+    void destroy();
+    
+    void serve();
 };
 
 #endif

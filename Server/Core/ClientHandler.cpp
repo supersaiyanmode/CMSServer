@@ -17,12 +17,16 @@ void ClientHandler::initialise() {
     ThreadingTCPServer::initialise();
 }
 
+void ClientHandler::serve() {
+    ThreadingTCPServer::serve();
+}
+
 void ClientHandler::shutdown() {
     ThreadingTCPServer::shutdown();
 }
 
 void ClientHandler::onIncomingConnection(Connection c) {
     ClientEndPoint cep(c, messageProcessor);
-    cep.process();
+    cep.processIncoming();
 }
 

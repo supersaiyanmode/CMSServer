@@ -10,6 +10,7 @@ public:
     virtual ~ClientHandler();
     
     virtual void initialise();
+    void serve();
     virtual void shutdown();
     
 protected:
