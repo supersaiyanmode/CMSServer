@@ -11,6 +11,7 @@ public:
     virtual ~CMSClient();
     
     UniqueID id() const;
+	virtual const std::string& destination() const = 0;
     
     virtual void onAcknowledgement(UniqueID, GenericCMSMessage&) {};
     virtual void onError(UniqueID, GenericCMSMessage&) {};
