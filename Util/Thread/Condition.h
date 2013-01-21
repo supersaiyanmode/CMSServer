@@ -19,7 +19,9 @@ public:
     void wait();
     int timedWait(PLATFORM_TIMESPAN);
     void signal();
-    
+    void broadcast();
+	
+	
     void destroy();
     
     virtual ~Condition();

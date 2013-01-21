@@ -33,6 +33,14 @@ void Condition::signal(){
 #endif
 }
 
+void Condition::broadcast() {
+#ifdef WIN32
+	
+#else
+	pthread_cond_broadcast(&condition);
+#endif
+}
+
 void Condition::destroy(){
     if (destroyed)
         return;
