@@ -1,5 +1,5 @@
 #include "CMSHeaderSet.h"
-#include "../../../Util/Regex/RegexMatcher.h"
+#include "../../../Util/String/StringUtils.h"
 
 //NOTE: This includes the last \n too!
 std::string CMSHeaderSet::str() {
@@ -32,11 +32,16 @@ bool CMSHeaderSet::parseCustomHeaders(const std::vector<std::string>& lines, CMS
     CMSHeaderSet headers;
     for (std::vector<std::string>::const_iterator it=lines.begin();
                     it != lines.end(); it++){
-        RegexMatcher re("^\\s*([A-Za-z0-9-]+)\\s*:\\s*(.*)$");
+        /*RegexMatcher re("^\\s*([A-Za-z0-9-]+)\\s*:\\s*(.*)$");
         if (!re.search(*it))
             return false;
         ExtractResult er = re.extract();
-        headers.headers[er[1].value] = er[2].value;
+        headers.headers[er[1].value] = er[2].value; */
+        std::vector<std::string> ret(StringUtils::splitAny(*it, ":"));
+        if (ret.size() != 2)
+            return false;
+        //TODO: Assert proper [A-Za-z0-9-] for key and value
+        headers.headers[StringUtils::trim(ret[0])] = StringUtils::trim(ret[1]);
     }
     headers.headers.swap(out.headers);
     return true;
