@@ -12,7 +12,10 @@ UNITS= \
 		obj/Client/CMSServerConnection.o\
 		obj/Client/QueueReceiver.o\
 		obj/Client/QueueSender.o\
+		obj/Client/TopicPublisher.o\
+		obj/Client/TopicSubscriber.o\
 		obj/main.o\
+		obj/Protocol/CMSDestination/CMSDestination.o\
 		obj/Protocol/CMSMessage/GenericCMSMessage.o\
 		obj/Protocol/CMSMessage/Header/CMSHeaderSet.o\
 		obj/Server/CMSServer.o\
@@ -23,6 +26,7 @@ UNITS= \
 		obj/Util/DataType/Primitive/Float.o\
 		obj/Util/DataType/Primitive/Number.o\
 		obj/Util/DataType/Primitive/String.o\
+		obj/Util/IO/InputOutputCapable.o\
 		obj/Util/IO/main.o\
 		obj/Util/IO/SocketIO/Connection.o\
 		obj/Util/IO/SocketIO/Socket.o\
@@ -35,10 +39,6 @@ UNITS= \
 		obj/Util/IO/Structure/Line/LineReader.o\
 		obj/Util/IO/Structure/Line/LineWriter.o\
 		obj/Util/Random/Sequential.o\
-		obj/Util/Regex/RegexMatcher.o\
-		obj/Util/Regex/Scintilla/CharClassify.o\
-		obj/Util/Regex/Scintilla/RESearch.o\
-		obj/Util/Regex/test/main.o\
 		obj/Util/Server/BaseTCPServer.o\
 		obj/Util/Server/RequestProcessors/ForkingRequestProcessor.o\
 		obj/Util/Server/RequestProcessors/ThreadingRequestProcessor.o\
@@ -49,6 +49,7 @@ UNITS= \
 		obj/Util/Server/ThreadingTCPServer.o\
 		obj/Util/Server/ThreadPoolTCPServer.o\
 		obj/Util/String/StringUtils.o\
+		obj/Util/String/test/main.o\
 		obj/Util/Thread/Condition.o\
 		obj/Util/Thread/Mutex.o\
 		obj/Util/Thread/ReadWriteLock.o\
@@ -68,6 +69,8 @@ obj/Client/CMSClient.o : Client/CMSClient.cpp  \
 		Protocol/CMSMessage/Header/CMSHeaderSet.h \
 		Util/Serialisable/Serialisable.h \
 		Util/IO/InputOutputCapable.h \
+		Protocol/CMSDestination/CMSDestination.h \
+		Util/Serialisable/Serialisable.h \
 		Util/Random/Sequential.h
 	@mkdir -p obj/Client
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Client/CMSClient.cpp -o obj/Client/CMSClient.o
@@ -80,16 +83,19 @@ obj/Client/CMSServerConnection.o : Client/CMSServerConnection.cpp  \
 		Util/IO/InputOutputCapable.h \
 		Util/IO/SocketIO/Connection.h \
 		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
 		Util/IO/SocketIO/TCPSocket.h \
 		Util/IO/SocketIO/Socket.h \
-		Util/IO/SocketIO/SocketException.h \
 		Util/Thread/Thread.h \
 		Util/Thread/Mutex.h \
+		Util/Thread/ReadWriteLock.h \
 		Util/Thread/Condition.h \
 		Util/Time/Time.h \
+		Util/Thread/ThreadLogger.h \
 		Util/Random/Sequential.h \
 		Client/CMSClient.h \
-		Util/Thread/ThreadLogger.h
+		Protocol/CMSDestination/CMSDestination.h \
+		Util/Serialisable/Serialisable.h
 	@mkdir -p obj/Client
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Client/CMSServerConnection.cpp -o obj/Client/CMSServerConnection.o
 
@@ -100,20 +106,20 @@ obj/Client/QueueReceiver.o : Client/QueueReceiver.cpp  \
 		Protocol/CMSMessage/Header/CMSHeaderSet.h \
 		Util/Serialisable/Serialisable.h \
 		Util/IO/InputOutputCapable.h \
+		Protocol/CMSDestination/CMSDestination.h \
+		Util/Serialisable/Serialisable.h \
 		Util/Random/Sequential.h \
 		Client/CMSServerConnection.h \
 		Util/IO/SocketIO/Connection.h \
 		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
 		Util/IO/SocketIO/TCPSocket.h \
 		Util/IO/SocketIO/Socket.h \
-		Util/IO/SocketIO/SocketException.h \
 		Util/Thread/Thread.h \
 		Util/Thread/Mutex.h \
+		Util/Thread/ReadWriteLock.h \
 		Util/Thread/Condition.h \
 		Util/Time/Time.h \
-		Util/Regex/RegexMatcher.h \
-		Util/Regex/Scintilla/RESearch.h \
-		Util/Regex/Scintilla/CharClassify.h \
 		Util/Thread/ThreadLogger.h
 	@mkdir -p obj/Client
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Client/QueueReceiver.cpp -o obj/Client/QueueReceiver.o
@@ -127,21 +133,71 @@ obj/Client/QueueSender.o : Client/QueueSender.cpp  \
 		Util/IO/InputOutputCapable.h \
 		Util/IO/SocketIO/Connection.h \
 		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
 		Util/IO/SocketIO/TCPSocket.h \
 		Util/IO/SocketIO/Socket.h \
-		Util/IO/SocketIO/SocketException.h \
 		Util/Thread/Thread.h \
 		Util/Thread/Mutex.h \
+		Util/Thread/ReadWriteLock.h \
 		Util/Thread/Condition.h \
 		Util/Time/Time.h \
+		Util/Thread/ThreadLogger.h \
 		Util/Random/Sequential.h \
 		Client/CMSClient.h \
-		Util/Regex/RegexMatcher.h \
-		Util/Regex/Scintilla/RESearch.h \
-		Util/Regex/Scintilla/CharClassify.h \
-		Util/Thread/ThreadLogger.h
+		Protocol/CMSDestination/CMSDestination.h \
+		Util/Serialisable/Serialisable.h
 	@mkdir -p obj/Client
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Client/QueueSender.cpp -o obj/Client/QueueSender.o
+
+obj/Client/TopicPublisher.o : Client/TopicPublisher.cpp  \
+		Client/TopicPublisher.h \
+		Client/CMSServerConnection.h \
+		Protocol/CMSMessage/GenericCMSMessage.h \
+		Protocol/CMSMessage/Header/CMSHeaderSet.h \
+		Util/Serialisable/Serialisable.h \
+		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/Connection.h \
+		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
+		Util/IO/SocketIO/TCPSocket.h \
+		Util/IO/SocketIO/Socket.h \
+		Util/Thread/Thread.h \
+		Util/Thread/Mutex.h \
+		Util/Thread/ReadWriteLock.h \
+		Util/Thread/Condition.h \
+		Util/Time/Time.h \
+		Util/Thread/ThreadLogger.h \
+		Util/Random/Sequential.h \
+		Client/CMSClient.h \
+		Protocol/CMSDestination/CMSDestination.h \
+		Util/Serialisable/Serialisable.h
+	@mkdir -p obj/Client
+	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Client/TopicPublisher.cpp -o obj/Client/TopicPublisher.o
+
+obj/Client/TopicSubscriber.o : Client/TopicSubscriber.cpp  \
+		Client/TopicSubscriber.h \
+		Client/CMSClient.h \
+		Protocol/CMSMessage/GenericCMSMessage.h \
+		Protocol/CMSMessage/Header/CMSHeaderSet.h \
+		Util/Serialisable/Serialisable.h \
+		Util/IO/InputOutputCapable.h \
+		Protocol/CMSDestination/CMSDestination.h \
+		Util/Serialisable/Serialisable.h \
+		Util/Random/Sequential.h \
+		Client/CMSServerConnection.h \
+		Util/IO/SocketIO/Connection.h \
+		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
+		Util/IO/SocketIO/TCPSocket.h \
+		Util/IO/SocketIO/Socket.h \
+		Util/Thread/Thread.h \
+		Util/Thread/Mutex.h \
+		Util/Thread/ReadWriteLock.h \
+		Util/Thread/Condition.h \
+		Util/Time/Time.h \
+		Util/Thread/ThreadLogger.h
+	@mkdir -p obj/Client
+	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Client/TopicSubscriber.cpp -o obj/Client/TopicSubscriber.o
 
 obj/main.o : main.cpp  \
 		Server/CMSServer.h \
@@ -158,9 +214,9 @@ obj/main.o : main.cpp  \
 		Util/Server/RequestProcessors/RequestProcessor.h \
 		Util/IO/SocketIO/Connection.h \
 		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
 		Util/IO/SocketIO/TCPSocket.h \
 		Util/IO/SocketIO/Socket.h \
-		Util/IO/SocketIO/SocketException.h \
 		Util/Server/RequestProcessors/ThreadingRequestProcessor.h \
 		Util/Thread/Thread.h \
 		Server/Core/MessageProcessor.h \
@@ -172,28 +228,44 @@ obj/main.o : main.cpp  \
 		Util/Thread/Mutex.h \
 		Util/Thread/Condition.h \
 		Util/Time/Time.h \
+		Util/Time/Time.h \
 		Client/QueueReceiver.h \
 		Client/CMSClient.h \
 		Protocol/CMSMessage/GenericCMSMessage.h \
 		Protocol/CMSMessage/Header/CMSHeaderSet.h \
 		Util/Serialisable/Serialisable.h \
 		Util/IO/InputOutputCapable.h \
+		Protocol/CMSDestination/CMSDestination.h \
+		Util/Serialisable/Serialisable.h \
 		Util/Random/Sequential.h \
 		Client/CMSServerConnection.h \
 		Util/IO/SocketIO/Connection.h \
 		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
 		Util/IO/SocketIO/TCPSocket.h \
 		Util/IO/SocketIO/Socket.h \
-		Util/IO/SocketIO/SocketException.h \
 		Util/Thread/Thread.h \
 		Util/Thread/Mutex.h \
+		Util/Thread/ReadWriteLock.h \
 		Util/Thread/Condition.h \
 		Util/Time/Time.h \
+		Util/Thread/ThreadLogger.h \
 		Client/QueueSender.h \
 		Util/Thread/ThreadLogger.h \
-		Util/Thread/Thread.h
+		Util/Thread/Thread.h \
+		Util/String/StringUtils.h \
+		Util/DataType/Primitive/Number.h \
+		Util/DataType/BaseDataType.h \
+		Util/Serialisable/Serialisable.h
 	@mkdir -p obj
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c main.cpp -o obj/main.o
+
+obj/Protocol/CMSDestination/CMSDestination.o : Protocol/CMSDestination/CMSDestination.cpp  \
+		Protocol/CMSDestination/CMSDestination.h \
+		Util/Serialisable/Serialisable.h \
+		Util/String/StringUtils.h
+	@mkdir -p obj/Protocol/CMSDestination
+	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Protocol/CMSDestination/CMSDestination.cpp -o obj/Protocol/CMSDestination/CMSDestination.o
 
 obj/Protocol/CMSMessage/GenericCMSMessage.o : Protocol/CMSMessage/GenericCMSMessage.cpp  \
 		Protocol/CMSMessage/GenericCMSMessage.h \
@@ -206,16 +278,15 @@ obj/Protocol/CMSMessage/GenericCMSMessage.o : Protocol/CMSMessage/GenericCMSMess
 		Util/IO/InputOutputCapable.h \
 		Util/DataType/Primitive/Number.h \
 		Util/DataType/BaseDataType.h \
-		Util/Serialisable/Serialisable.h
+		Util/Serialisable/Serialisable.h \
+		Util/Thread/ThreadLogger.h
 	@mkdir -p obj/Protocol/CMSMessage
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Protocol/CMSMessage/GenericCMSMessage.cpp -o obj/Protocol/CMSMessage/GenericCMSMessage.o
 
 obj/Protocol/CMSMessage/Header/CMSHeaderSet.o : Protocol/CMSMessage/Header/CMSHeaderSet.cpp  \
 		Protocol/CMSMessage/Header/CMSHeaderSet.h \
 		Util/Serialisable/Serialisable.h \
-		Util/Regex/RegexMatcher.h \
-		Util/Regex/Scintilla/RESearch.h \
-		Util/Regex/Scintilla/CharClassify.h
+		Util/String/StringUtils.h
 	@mkdir -p obj/Protocol/CMSMessage/Header
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Protocol/CMSMessage/Header/CMSHeaderSet.cpp -o obj/Protocol/CMSMessage/Header/CMSHeaderSet.o
 
@@ -234,9 +305,9 @@ obj/Server/CMSServer.o : Server/CMSServer.cpp  \
 		Util/Server/RequestProcessors/RequestProcessor.h \
 		Util/IO/SocketIO/Connection.h \
 		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
 		Util/IO/SocketIO/TCPSocket.h \
 		Util/IO/SocketIO/Socket.h \
-		Util/IO/SocketIO/SocketException.h \
 		Util/Server/RequestProcessors/ThreadingRequestProcessor.h \
 		Util/Thread/Thread.h \
 		Server/Core/MessageProcessor.h \
@@ -247,6 +318,7 @@ obj/Server/CMSServer.o : Server/CMSServer.cpp  \
 		Util/Thread/ReadWriteLock.h \
 		Util/Thread/Mutex.h \
 		Util/Thread/Condition.h \
+		Util/Time/Time.h \
 		Util/Time/Time.h
 	@mkdir -p obj/Server
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Server/CMSServer.cpp -o obj/Server/CMSServer.o
@@ -262,13 +334,15 @@ obj/Server/Core/ClientEndPoint.o : Server/Core/ClientEndPoint.cpp  \
 		Util/Thread/Mutex.h \
 		Util/Thread/Condition.h \
 		Util/Time/Time.h \
+		Util/Time/Time.h \
 		Util/IO/SocketIO/Connection.h \
 		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
 		Util/IO/SocketIO/TCPSocket.h \
 		Util/IO/SocketIO/Socket.h \
-		Util/IO/SocketIO/SocketException.h \
 		Util/Thread/Thread.h \
-		Util/Thread/SynchronisedQueue.h
+		Util/Thread/SynchronisedQueue.h \
+		Util/Thread/ThreadLogger.h
 	@mkdir -p obj/Server/Core
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Server/Core/ClientEndPoint.cpp -o obj/Server/Core/ClientEndPoint.o
 
@@ -286,9 +360,9 @@ obj/Server/Core/ClientHandler.o : Server/Core/ClientHandler.cpp  \
 		Util/Server/RequestProcessors/RequestProcessor.h \
 		Util/IO/SocketIO/Connection.h \
 		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
 		Util/IO/SocketIO/TCPSocket.h \
 		Util/IO/SocketIO/Socket.h \
-		Util/IO/SocketIO/SocketException.h \
 		Util/Server/RequestProcessors/ThreadingRequestProcessor.h \
 		Util/Thread/Thread.h \
 		Server/Core/MessageProcessor.h \
@@ -300,13 +374,14 @@ obj/Server/Core/ClientHandler.o : Server/Core/ClientHandler.cpp  \
 		Util/Thread/Mutex.h \
 		Util/Thread/Condition.h \
 		Util/Time/Time.h \
+		Util/Time/Time.h \
 		Util/Thread/ThreadLogger.h \
 		Server/Core/ClientEndPoint.h \
 		Util/IO/SocketIO/Connection.h \
 		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
 		Util/IO/SocketIO/TCPSocket.h \
 		Util/IO/SocketIO/Socket.h \
-		Util/IO/SocketIO/SocketException.h \
 		Util/Thread/Thread.h \
 		Util/Thread/SynchronisedQueue.h
 	@mkdir -p obj/Server/Core
@@ -321,7 +396,18 @@ obj/Server/Core/MessageProcessor.o : Server/Core/MessageProcessor.cpp  \
 		Util/Thread/ReadWriteLock.h \
 		Util/Thread/Mutex.h \
 		Util/Thread/Condition.h \
-		Util/Time/Time.h
+		Util/Time/Time.h \
+		Util/Time/Time.h \
+		Server/Core/ClientEndPoint.h \
+		Util/IO/SocketIO/Connection.h \
+		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
+		Util/IO/SocketIO/TCPSocket.h \
+		Util/IO/SocketIO/Socket.h \
+		Util/Thread/Thread.h \
+		Util/Thread/SynchronisedQueue.h \
+		Util/Random/Sequential.h \
+		Util/Thread/ThreadLogger.h
 	@mkdir -p obj/Server/Core
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Server/Core/MessageProcessor.cpp -o obj/Server/Core/MessageProcessor.o
 
@@ -355,6 +441,11 @@ obj/Util/DataType/Primitive/String.o : Util/DataType/Primitive/String.cpp  \
 	@mkdir -p obj/Util/DataType/Primitive
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Util/DataType/Primitive/String.cpp -o obj/Util/DataType/Primitive/String.o
 
+obj/Util/IO/InputOutputCapable.o : Util/IO/InputOutputCapable.cpp  \
+		Util/IO/InputOutputCapable.h
+	@mkdir -p obj/Util/IO
+	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Util/IO/InputOutputCapable.cpp -o obj/Util/IO/InputOutputCapable.o
+
 obj/Util/IO/main.o : Util/IO/main.cpp  \
 		Util/IO/Structure/Line/LineReader.h \
 		Util/IO/InputOutputCapable.h \
@@ -372,9 +463,9 @@ obj/Util/IO/main.o : Util/IO/main.cpp  \
 obj/Util/IO/SocketIO/Connection.o : Util/IO/SocketIO/Connection.cpp  \
 		Util/IO/SocketIO/Connection.h \
 		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
 		Util/IO/SocketIO/TCPSocket.h \
 		Util/IO/SocketIO/Socket.h \
-		Util/IO/SocketIO/SocketException.h \
 		Util/IO/SocketIO/TCPServerSocket.h \
 		Util/IO/SocketIO/TCPClientSocket.h
 	@mkdir -p obj/Util/IO/SocketIO
@@ -388,7 +479,8 @@ obj/Util/IO/SocketIO/Socket.o : Util/IO/SocketIO/Socket.cpp  \
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Util/IO/SocketIO/Socket.cpp -o obj/Util/IO/SocketIO/Socket.o
 
 obj/Util/IO/SocketIO/SocketException.o : Util/IO/SocketIO/SocketException.cpp  \
-		Util/IO/SocketIO/SocketException.h
+		Util/IO/SocketIO/SocketException.h \
+		Util/IO/InputOutputCapable.h
 	@mkdir -p obj/Util/IO/SocketIO
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Util/IO/SocketIO/SocketException.cpp -o obj/Util/IO/SocketIO/SocketException.o
 
@@ -449,31 +541,6 @@ obj/Util/Random/Sequential.o : Util/Random/Sequential.cpp  \
 	@mkdir -p obj/Util/Random
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Util/Random/Sequential.cpp -o obj/Util/Random/Sequential.o
 
-obj/Util/Regex/RegexMatcher.o : Util/Regex/RegexMatcher.cpp  \
-		Util/Regex/RegexMatcher.h \
-		Util/Regex/Scintilla/RESearch.h \
-		Util/Regex/Scintilla/CharClassify.h
-	@mkdir -p obj/Util/Regex
-	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Util/Regex/RegexMatcher.cpp -o obj/Util/Regex/RegexMatcher.o
-
-obj/Util/Regex/Scintilla/CharClassify.o : Util/Regex/Scintilla/CharClassify.cpp  \
-		Util/Regex/Scintilla/CharClassify.h
-	@mkdir -p obj/Util/Regex/Scintilla
-	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Util/Regex/Scintilla/CharClassify.cpp -o obj/Util/Regex/Scintilla/CharClassify.o
-
-obj/Util/Regex/Scintilla/RESearch.o : Util/Regex/Scintilla/RESearch.cpp  \
-		Util/Regex/Scintilla/CharClassify.h \
-		Util/Regex/Scintilla/RESearch.h
-	@mkdir -p obj/Util/Regex/Scintilla
-	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Util/Regex/Scintilla/RESearch.cpp -o obj/Util/Regex/Scintilla/RESearch.o
-
-obj/Util/Regex/test/main.o : Util/Regex/test/main.cpp  \
-		Util/Regex/RegexMatcher.h \
-		Util/Regex/Scintilla/RESearch.h \
-		Util/Regex/Scintilla/CharClassify.h
-	@mkdir -p obj/Util/Regex/test
-	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Util/Regex/test/main.cpp -o obj/Util/Regex/test/main.o
-
 obj/Util/Server/BaseTCPServer.o : Util/Server/BaseTCPServer.cpp  \
 		Util/Server/BaseTCPServer.h \
 		Util/Server/ServerSkeleton.h \
@@ -486,9 +553,9 @@ obj/Util/Server/BaseTCPServer.o : Util/Server/BaseTCPServer.cpp  \
 		Util/Server/RequestProcessors/RequestProcessor.h \
 		Util/IO/SocketIO/Connection.h \
 		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
 		Util/IO/SocketIO/TCPSocket.h \
-		Util/IO/SocketIO/Socket.h \
-		Util/IO/SocketIO/SocketException.h
+		Util/IO/SocketIO/Socket.h
 	@mkdir -p obj/Util/Server
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Util/Server/BaseTCPServer.cpp -o obj/Util/Server/BaseTCPServer.o
 
@@ -502,9 +569,9 @@ obj/Util/Server/RequestProcessors/ThreadingRequestProcessor.o : Util/Server/Requ
 		Util/Server/RequestProcessors/RequestProcessor.h \
 		Util/IO/SocketIO/Connection.h \
 		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
 		Util/IO/SocketIO/TCPSocket.h \
 		Util/IO/SocketIO/Socket.h \
-		Util/IO/SocketIO/SocketException.h \
 		Util/Thread/Thread.h
 	@mkdir -p obj/Util/Server/RequestProcessors
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Util/Server/RequestProcessors/ThreadingRequestProcessor.cpp -o obj/Util/Server/RequestProcessors/ThreadingRequestProcessor.o
@@ -514,9 +581,9 @@ obj/Util/Server/RequestProcessors/ThreadPoolRequestProcessor.o : Util/Server/Req
 		Util/Server/RequestProcessors/RequestProcessor.h \
 		Util/IO/SocketIO/Connection.h \
 		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
 		Util/IO/SocketIO/TCPSocket.h \
 		Util/IO/SocketIO/Socket.h \
-		Util/IO/SocketIO/SocketException.h \
 		Util/Thread/Thread.h \
 		Util/Thread/ThreadPool.h \
 		Util/Thread/ThreadLogger.h \
@@ -551,9 +618,9 @@ obj/Util/Server/test/ThreadingTCPServerTest.o : Util/Server/test/ThreadingTCPSer
 		Util/Server/RequestProcessors/RequestProcessor.h \
 		Util/IO/SocketIO/Connection.h \
 		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
 		Util/IO/SocketIO/TCPSocket.h \
 		Util/IO/SocketIO/Socket.h \
-		Util/IO/SocketIO/SocketException.h \
 		Util/Server/RequestProcessors/ThreadingRequestProcessor.h \
 		Util/Thread/Thread.h \
 		Util/IO/Structure/Line/LineReader.h \
@@ -578,9 +645,9 @@ obj/Util/Server/test/ThreadPoolTCPServerTest.o : Util/Server/test/ThreadPoolTCPS
 		Util/Server/RequestProcessors/RequestProcessor.h \
 		Util/IO/SocketIO/Connection.h \
 		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
 		Util/IO/SocketIO/TCPSocket.h \
 		Util/IO/SocketIO/Socket.h \
-		Util/IO/SocketIO/SocketException.h \
 		Util/Server/RequestProcessors/ThreadPoolRequestProcessor.h \
 		Util/Thread/Thread.h \
 		Util/Thread/ThreadPool.h \
@@ -611,9 +678,9 @@ obj/Util/Server/ThreadingTCPServer.o : Util/Server/ThreadingTCPServer.cpp  \
 		Util/Server/RequestProcessors/RequestProcessor.h \
 		Util/IO/SocketIO/Connection.h \
 		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
 		Util/IO/SocketIO/TCPSocket.h \
 		Util/IO/SocketIO/Socket.h \
-		Util/IO/SocketIO/SocketException.h \
 		Util/Server/RequestProcessors/ThreadingRequestProcessor.h \
 		Util/Thread/Thread.h
 	@mkdir -p obj/Util/Server
@@ -632,9 +699,9 @@ obj/Util/Server/ThreadPoolTCPServer.o : Util/Server/ThreadPoolTCPServer.cpp  \
 		Util/Server/RequestProcessors/RequestProcessor.h \
 		Util/IO/SocketIO/Connection.h \
 		Util/IO/InputOutputCapable.h \
+		Util/IO/SocketIO/SocketException.h \
 		Util/IO/SocketIO/TCPSocket.h \
 		Util/IO/SocketIO/Socket.h \
-		Util/IO/SocketIO/SocketException.h \
 		Util/Server/RequestProcessors/ThreadPoolRequestProcessor.h \
 		Util/Thread/Thread.h \
 		Util/Thread/ThreadPool.h \
@@ -650,6 +717,11 @@ obj/Util/String/StringUtils.o : Util/String/StringUtils.cpp  \
 		Util/String/StringUtils.h
 	@mkdir -p obj/Util/String
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Util/String/StringUtils.cpp -o obj/Util/String/StringUtils.o
+
+obj/Util/String/test/main.o : Util/String/test/main.cpp  \
+		Util/String/StringUtils.h
+	@mkdir -p obj/Util/String/test
+	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Util/String/test/main.cpp -o obj/Util/String/test/main.o
 
 obj/Util/Thread/Condition.o : Util/Thread/Condition.cpp  \
 		Util/Thread/Condition.h \
