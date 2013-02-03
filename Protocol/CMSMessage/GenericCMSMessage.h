@@ -8,7 +8,7 @@
 
 class GenericCMSMessage: public Serialisable{
     CMSHeaderSet standardHeaders,customHeaders;
-    std::string message;
+    std::string message_;
     
     static GenericCMSMessage read(InputOutputCapable&);
 public:
@@ -37,7 +37,7 @@ public:
     CMSMessageType category() const;
     
     std::string str();
-    
+    const std::string& message() const;
     
     
     
@@ -95,6 +95,10 @@ inline bool GenericCMSMessage::isForward() const {
 
 inline GenericCMSMessage::CMSMessageType GenericCMSMessage::category() const {
     return strToCMSMessageType(standardHeaders.get("category"));
+}
+
+inline const std::string& GenericCMSMessage::message() const {
+    return message_;
 }
 
 

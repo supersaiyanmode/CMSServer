@@ -4,6 +4,7 @@
 #include "../../Util/IO/Structure/Line/LineReader.h"
 #include "../../Util/IO/Structure/Block/BlockReader.h"
 #include "../../Util/DataType/Primitive/Number.h"
+#include "../../Util/Thread/ThreadLogger.h"
 
 namespace {
     bool readHeaders(LineReader& lr, std::vector<std::string>& lines){
@@ -25,7 +26,7 @@ GenericCMSMessage::GenericCMSMessage(){}
 GenericCMSMessage::~GenericCMSMessage(){}
 
 GenericCMSMessage::GenericCMSMessage(const CMSHeaderSet& h1, const CMSHeaderSet& h2,
-            const std::string& msg) : standardHeaders(h1), customHeaders(h2), message(msg){
+            const std::string& msg) : standardHeaders(h1), customHeaders(h2), message_(msg){
     
 }
 
@@ -68,15 +69,21 @@ bool GenericCMSMessage::read(InputOutputCapable& device, GenericCMSMessage& out)
     int length = (int)num;
     
     BlockReader br(device, lr.getBackBuffer());
-    out.message = br.read(length);
+    out.message_ = br.read(length);
     return true;
 }
 
 bool GenericCMSMessage::parse(InputOutputCapable& device, GenericCMSMessage& out,
                 bool (*condition)(const GenericCMSMessage&)){
-    if (!read(device, out))
-        return false;
     
+    try{
+        if (!read(device, out))
+            return false;
+    } catch (ReadException& e) {
+        device.closeReading();
+        return false; //Consider rethrowing, handle outside
+    }
+
     if (condition)
         return (*condition)(out);
     return true;
@@ -84,8 +91,13 @@ bool GenericCMSMessage::parse(InputOutputCapable& device, GenericCMSMessage& out
 
 bool GenericCMSMessage::parse(InputOutputCapable& device, GenericCMSMessage& out, 
                 const std::vector<bool (*)(const GenericCMSMessage&)>& conditions){
-    if (!read(device, out))
-        return false;
+    try {
+        if (!read(device, out))
+            return false;
+    } catch (ReadException& e) {
+        device.closeReading();
+        return false; //rethrow? 
+    }
     
     for (std::vector<bool (*)(const GenericCMSMessage&)>::const_iterator it=conditions.begin();
                             it != conditions.end(); it++){
@@ -100,11 +112,11 @@ bool GenericCMSMessage::parse(InputOutputCapable& device, GenericCMSMessage& out
 const std::vector<bool (*)(GenericCMSMessage)>& = std::vector<bool (*)(GenericCMSMessage)>());*/
 
 std::string GenericCMSMessage::str() {
-    standardHeaders["content-length"] = Number(message.length()).str();
+    standardHeaders["content-length"] = Number(message_.length()).str();
     std::string ret(standardHeaders.str() + "\n");
     if (standardHeaders["has-custom-headers"] == "true")
         ret += customHeaders.str() + "\n";
-    if (message.length() > 0)
-        ret += message;
+    if (message_.length() > 0)
+        ret += message_;
     return ret;
 }
