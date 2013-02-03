@@ -1,19 +1,19 @@
-#ifndef CMS_QUEUE_RECEIVER_H
-#define CMS_QUEUE_RECEIVER_H
+#ifndef CMS_TOPIC_SUBSCRIBER_H
+#define CMS_TOPIC_SUBSCRIBER_H
 
 #include "CMSClient.h"
 #include "CMSServerConnection.h"
 #include "../Protocol/CMSDestination/CMSDestination.h"
-class QueueReceiver : public CMSClient {
+class TopicSubscriber : public CMSClient {
     CMSServerConnection& conn;
     CMSDestination cmsDestination;
     
     
-    QueueReceiver(const QueueReceiver&);
-    QueueReceiver& operator=(const QueueReceiver&);
+    TopicSubscriber(const TopicSubscriber&);
+    TopicSubscriber& operator=(const TopicSubscriber&);
 protected:
-    QueueReceiver(CMSServerConnection&, const std::string&);
-    virtual ~QueueReceiver();
+    TopicSubscriber(CMSServerConnection&, const std::string&);
+    virtual ~TopicSubscriber();
 
 	const CMSDestination& destination() const;
     
@@ -25,7 +25,7 @@ public:
 
 //INLINE FUNCTIONS
 
-inline const CMSDestination& QueueReceiver::destination() const {
+inline const CMSDestination& TopicSubscriber::destination() const {
 	return cmsDestination;
 }
 

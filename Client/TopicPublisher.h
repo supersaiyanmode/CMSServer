@@ -1,28 +1,29 @@
-#ifndef QUEUE_SENDER_H
-#define QUEUE_SENDER_H
+#ifndef TOPIC_PUBLISHER_H
+#define TOPIC_PUBLISHER_H
 
 #include "CMSServerConnection.h"
 #include "../Protocol/CMSMessage/GenericCMSMessage.h"
 #include "../Protocol/CMSDestination/CMSDestination.h"
 
-class QueueSender {
+class TopicPublisher {
     CMSServerConnection& conn;
     CMSDestination destination;
     
-    QueueSender(const QueueSender&);
-    QueueSender& operator=(const QueueSender&);
+    TopicPublisher(const TopicPublisher&);
+    TopicPublisher& operator=(const TopicPublisher&);
     
 protected:
-    QueueSender(CMSServerConnection&, const std::string&);
-    ~QueueSender();
+    TopicPublisher(CMSServerConnection&, const std::string&);
+    ~TopicPublisher();
     
     void onAcknowledgement(UniqueID, GenericCMSMessage&);
     void onError(UniqueID, GenericCMSMessage&);
     void onMessage(GenericCMSMessage&);
 
 public:
-    bool send(const CMSHeaderSet&, const std::string&);
-    bool send(const std::string&);
+    bool publish(const CMSHeaderSet&, const std::string&);
+    bool publish(const std::string&);
     
 };
+
 #endif

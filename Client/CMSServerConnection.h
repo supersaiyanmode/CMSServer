@@ -5,6 +5,8 @@
 #include "../Util/IO/SocketIO/Connection.h"
 #include "../Util/Thread/Thread.h"
 #include "../Util/Thread/Mutex.h"
+#include "../Util/Thread/ReadWriteLock.h"
+#include "../Util/Thread/ThreadLogger.h"
 #include "../Util/Thread/Condition.h"
 #include "../Util/Random/Sequential.h"
 #include "CMSClient.h"
@@ -12,8 +14,10 @@
 #include <map>
 
 struct ACKWaiter {
+    bool result;
     Mutex* mutex;
     Condition* condition;
+    GenericCMSMessage ackMsg;
 };
 
 struct CMSMessageSendData {
@@ -28,7 +32,7 @@ class CMSServerConnection {
     bool connectionActive;
     Connection conn;
     std::map<UniqueID, CMSClient*> clients;
-    Mutex *clientsMapLock;
+    ReadWriteLock *clientsMapRWLock;
     bool closed;
     
     
@@ -44,32 +48,32 @@ class CMSServerConnection {
     //Resend stuff
     /* not using a map, vector instead. Erase all the items before last received ACK */
     std::vector<CMSMessageSendData> sentData; 
-    Mutex *sentDataLock;
+    ReadWriteLock *sentDataRWLock;
     bool resendThreadActive;
     Thread<CMSServerConnection, int> *resendThread;
     
     
     //Wait stuff
     std::map<UniqueID, ACKWaiter> waiters;
-    Mutex *waitersLock;
+    ReadWriteLock *waitersRWLock;
     
     
     
     CMSServerConnection(const std::string&, int);
-    ~CMSServerConnection();
     
-    bool doRegister(CMSClient*, bool);
+    bool doRegister(CMSClient*, bool, GenericCMSMessage&);
     void resendProcess(int);
     
     bool write_(GenericCMSMessage&, bool);
 public:
+    ~CMSServerConnection();
     static CMSServerConnection* createCMSServerConnection(const std::string&, int);
     
     bool readable() const;
     bool writable() const;
     
     UniqueID write(GenericCMSMessage&);
-    bool writeWithAck(GenericCMSMessage&);
+    bool writeWithAck(GenericCMSMessage&, GenericCMSMessage&);
     
     void close();
     
@@ -82,6 +86,16 @@ public:
 
 
 
+/*
+
+    TODO: Implement reader-writer lock
+    implement lock for writeWithAck, ack msg write and read form Waiter Strucuture
+
+
+
+*/
+
+
 
 //INLINE FUNCTIONS
 inline bool CMSServerConnection::writable() const {
@@ -90,15 +104,6 @@ inline bool CMSServerConnection::writable() const {
 
 inline bool CMSServerConnection::readable() const {
     return conn.readable() && connectionActive;
-}
-
-
-inline bool CMSServerConnection::registerClient(CMSClient* receiver) {
-    return doRegister(receiver, true);
-}
-
-inline bool CMSServerConnection::unregisterClient(CMSClient* receiver) {
-    return doRegister(receiver, false);
 }
 
 inline CMSServerConnection* CMSServerConnection::createCMSServerConnection(

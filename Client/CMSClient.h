@@ -2,6 +2,7 @@
 #define CMS_CLIENT_H
 
 #include "../Protocol/CMSMessage/GenericCMSMessage.h"
+#include "../Protocol/CMSDestination/CMSDestination.h"
 #include "../Util/Random/Sequential.h"
 
 class CMSClient {
@@ -11,11 +12,13 @@ public:
     virtual ~CMSClient();
     
     UniqueID id() const;
-	virtual const std::string& destination() const = 0;
+	virtual const CMSDestination& destination() const = 0;
     
-    virtual void onAcknowledgement(UniqueID, GenericCMSMessage&) {};
-    virtual void onError(UniqueID, GenericCMSMessage&) {};
-    virtual void onMessage(GenericCMSMessage&) {};
+    virtual void onAcknowledgement(UniqueID, GenericCMSMessage&) {}
+    virtual void onError(UniqueID, GenericCMSMessage&) {}
+    virtual void onMessage(GenericCMSMessage&) {}
+    
+    virtual void onDisconnect(){}
 };
 
 
