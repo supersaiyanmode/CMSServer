@@ -1,5 +1,5 @@
 #include "ClientEndPoint.h"
-
+#include "../../Util/Thread/ThreadLogger.h"
 ClientEndPoint::ClientEndPoint(Connection& c, MessageProcessor& mp): 
                 active(true), conn(c), messageProcessor(mp) {
     queue = SynchronisedQueue<GenericCMSMessage>::createSynchronisedQueue();
@@ -8,6 +8,9 @@ ClientEndPoint::ClientEndPoint(Connection& c, MessageProcessor& mp):
 }
 
 ClientEndPoint::~ClientEndPoint(){
+    //inform MessageProcessor
+    messageProcessor.removeClient(this);
+    
     active = false;
     conn.close();
     outThread->join();
@@ -35,8 +38,7 @@ void ClientEndPoint::processIncoming(int){
     while (active && conn.readable()) {
         GenericCMSMessage msg;
         if (!GenericCMSMessage::parse(conn, msg)) {
-            std::cout<<"Invalid CMS Message!!\n";
-            continue;
+            continue; //would break if !conn.readable(); else ignore current message and go on!
         }
         
         //Register Session
@@ -45,8 +47,8 @@ void ClientEndPoint::processIncoming(int){
         if (msg.isForward()) {
             GenericCMSMessage ackMsg;
             ackMsg.updateStandardHeader("receiver-id", "<SERVER>");
-            ackMsg.updateStandardHeader("acknowlegdement-for-message-id", 
-                msg.getStandardHeader("message-id"));
+            ackMsg.updateStandardHeader("acknowlegdement-for-local-message-id", 
+                msg.getStandardHeader("local-message-id"));
             ackMsg.updateStandardHeader("category",
                 msg.getStandardHeader("category"));
             ackMsg.updateStandardHeader("direction","backward");
@@ -84,14 +86,21 @@ void ClientEndPoint::processIncoming(int){
                     break;
                 }
             }
-            ackMsg.updateStandardHeader("acknowledgement-result", resultStr);
+            if (resultStr == "SUCCESS")
+                ackMsg.updateStandardHeader("acknowledgement-result", "SUCCESS");
+            else{
+                ackMsg.updateStandardHeader("acknowledgement-result", "ERROR");
+                ackMsg.updateStandardHeader("acknowledgement-error-description", resultStr);
+            }
+            
             addOutboundMessage(ackMsg);
         } else { 
             //implicit that its backward (ACK)
             //GenericCMSMessage::parse(..) must validate value too - TODO!
             
         }
-        std::cout<<"Got:\n"<<msg.str()<<std::endl;
+        //std::cout<<"Got:\n"<<msg.str()<<std::endl;
     }
     conn.closeReading();
+    active = false;
 }

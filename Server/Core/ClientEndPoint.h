@@ -10,7 +10,6 @@
 #include "../../Util/Thread/SynchronisedQueue.h"
 #include "../../Protocol/CMSMessage/GenericCMSMessage.h"
 
-
 class ClientEndPoint {
 public:
 	ClientEndPoint(Connection &, MessageProcessor&);
@@ -31,6 +30,7 @@ private:
 	
 	Connection& conn;
 	MessageProcessor& messageProcessor;
+    
 };
 
 #endif

@@ -6,6 +6,7 @@
 
 #include "../../Protocol/CMSMessage/GenericCMSMessage.h"
 #include "../../Util/Thread/ReadWriteLock.h"
+#include "../../Util/Time/Time.h"
 
 class ClientEndPoint;
 
@@ -13,6 +14,9 @@ struct RegistrationData {
 	ClientEndPoint* client;
 	std::string receiverID;
 	std::string destination;
+    std::string destinationType; // "queue" or "topic"
+    
+    Time lastServed;
 };
 
 class MessageProcessor {
@@ -25,8 +29,16 @@ public:
 	
     bool processQueueMessage(GenericCMSMessage&);
     bool processTopicMessage(GenericCMSMessage&);
+    
+    void removeClient(ClientEndPoint*);
+    
+protected:
+    virtual bool onReceiverRegistrationRequest() = 0;
+    virtual bool onReceiverUnregistrationRequest() = 0;
+    
 private:
-	
+    std::vector<std::vector<RegistrationData>::iterator> findAll(
+        ClientEndPoint*, const std::string&, const std::string&, int fields);
     std::vector<RegistrationData>::iterator find(
         ClientEndPoint*, const std::string&, const std::string&, int fields);
     

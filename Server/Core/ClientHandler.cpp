@@ -26,7 +26,12 @@ void ClientHandler::shutdown() {
 }
 
 void ClientHandler::onIncomingConnection(Connection c) {
+    if (!this->onConnection(c))
+        return;
+
     ClientEndPoint cep(c, messageProcessor);
     cep.processIncoming();
+    
+    this->onDisconnection(c);
 }
 

@@ -15,7 +15,8 @@ public:
     
 protected:
     void onIncomingConnection(Connection);
-	
+	virtual bool onConnection(const Connection&) const = 0;
+    virtual void onDisconnection(const Connection&) const = 0;
 private:
 	MessageProcessor& messageProcessor;
 };
