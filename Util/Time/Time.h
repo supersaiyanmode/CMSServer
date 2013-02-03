@@ -21,6 +21,8 @@ public:
     unsigned long seconds() const;
     unsigned long useconds() const;
     
+    bool operator < (const Time& other) const;
+    
     static Time now();
     static PLATFORM_TIMESPAN after(unsigned int);
 };
@@ -35,6 +37,15 @@ inline unsigned long Time::seconds() const{
 }
 inline unsigned long Time::useconds() const{
     return useconds_;
+}
+
+inline bool Time::operator < (const Time& other) const {
+    if (seconds_ < other.seconds_)
+        return true;
+    else if (seconds_ > other.seconds_)
+        return false;
+    else 
+        return useconds_ < other.useconds_;
 }
 
 #endif
