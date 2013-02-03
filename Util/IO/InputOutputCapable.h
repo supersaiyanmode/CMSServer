@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <exception>
 
 class InputOutputCapable {
 public:
@@ -19,6 +20,33 @@ public:
     
     virtual bool writable() const = 0;
     virtual bool readable() const = 0;
+};
+
+class IOException : public std::exception {
+protected:
+    std::string msg;
+public:
+    IOException(const std::string&);
+    virtual ~IOException() throw();
+    
+    virtual const char* what() throw();
+};
+
+class ReadException: public IOException {
+public:
+    ReadException(const std::string&);
+    virtual ~ReadException() throw();
+    
+    virtual const char* what() throw();
+};
+
+
+class WriteException: public IOException {
+public:
+    WriteException(const std::string&);
+    virtual ~WriteException() throw();
+    
+    virtual const char* what() throw();
 };
 
 #endif

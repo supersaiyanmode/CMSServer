@@ -62,11 +62,11 @@ Socket::~Socket(){
 }
 
 void Socket::setIOStatus(int read, int write){ //-1 to retain state, 0/1 to set
-    if (write > 0)
+    if (write >= 0)
         writeActive = !!write;
-    if (read > 0)
+    if (read >= 0)
         readActive = !!read;
-
+    
     if (!writeActive && !readActive){
         state = CLOSED;
         this->close();
@@ -80,15 +80,15 @@ void Socket::initialise(){
 
 int Socket::write(const char* buf, int len){
     if (!writeActive)
-        throw SocketException("Socket not ready for writing");
+        throw SocketWriteException("Socket not ready for writing");
     int res = write_(this->socket, buf, len); 
     if (res < 0){
         //EOF or error when <0
         setIOStatus(-1,0);
         if (res == 0)
-            throw SocketException("Unable to write anything.");
+            throw SocketWriteException("Unable to write anything.");
         else
-            throw SocketException("Error encountered while writing");
+            throw SocketWriteException("Error encountered while writing");
     }
     return res;
 }
@@ -104,15 +104,15 @@ int Socket::write(const std::string& str){
 
 int Socket::read(char* buf, int len){
     if (!readActive)
-        throw SocketException("Socket not ready for reading");
+        throw SocketReadException("Socket not ready for reading");
     int res = read_(this->socket, buf, len);
     if (res <= 0){
         //EOF or error when <0
         setIOStatus(0,-1);
         if (res == 0)
-            throw SocketException("EOF Encountered");
+            throw SocketReadException("EOF Encountered");
         else
-            throw SocketException("Error encountered while reading");
+            throw SocketReadException("Error encountered while reading");
     }
     return res;
 }
