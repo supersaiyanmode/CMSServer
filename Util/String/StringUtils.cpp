@@ -19,3 +19,29 @@ std::string StringUtils::rtrim(const std::string& s, const std::string& trimChar
 std::string StringUtils::trim(const std::string& s, const std::string& trimChars){
     return ltrim(rtrim(s,trimChars), trimChars);
 }
+
+std::vector<std::string> StringUtils::splitAny(const std::string& str, const std::string& sep,
+                        bool keepEmpty) {
+    std::vector<std::string> ret;
+    size_t start=0, end;
+    while(true) {
+        end = str.find_first_of(sep, start);
+        if(end == std::string::npos) {
+            end = str.length();
+            if(start != end || keepEmpty)
+                ret.push_back(std::string(str.begin()+start, str.begin()+end));
+            break;
+        } else {
+             if(start != end || keepEmpty)
+                 ret.push_back(std::string(str.begin()+start, str.begin()+end));
+        }
+        start = end + 1;
+    }
+    return ret;
+}
+
+std::vector<std::string> StringUtils::split(const std::string& str, const std::string& sep,
+                    bool keepEmpty){
+    std::vector<std::string> ret;
+    return ret;
+}
