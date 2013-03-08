@@ -18,11 +18,13 @@ struct ThreadStruct {
     T* object;
     void (T::*function)(P);
     P argument;
+    
+    void* thread;
 };
 
 template <typename T, typename P>
 class Thread : public ThreadBase {
-    bool cancelled;
+    bool exited;
     
     Thread(const Thread<T,P>& other): object(other.object),
             function(other.function), thread(other.thread) {
@@ -43,8 +45,8 @@ public:
     }
     
     void start(const P& arg){
-        cancelled = false;
-        ThreadStruct<T,P> ts = {object, function, arg};
+        exited = false;
+        ThreadStruct<T,P> ts = {object, function, arg, (void*)this};
         ThreadStruct<T,P>* threadStruct = new ThreadStruct<T,P>(ts);
         //std::cout<<"About to fork!\n";
     #if WIN32
@@ -55,24 +57,29 @@ public:
     }
     
     void join(){
+        if (exited)
+            return;
     #if WIN32
         ::WaitForSingleObject(thread, INFINITE);
     #else
         pthread_join(thread,NULL);
     #endif
+        exited = true;
     }
     
     void kill(){
+        if (exited)
+            return;
     #if WIN32
         ::TerminateThread(thread, 0);
     #else
         pthread_cancel(thread);
     #endif
-        cancelled = true;
+        exited = true;
     }
 
     ~Thread(){
-        if (!cancelled)
+        if (!exited)
             kill();
     }
 private:
@@ -86,14 +93,15 @@ private:
     pthread_t thread;
     static void* createThread(void* obj){
 #endif
-        //std::cout<<"Forked off a new thread baby!\n";
         ThreadStruct<T,P>& data = *(ThreadStruct<T,P>*)(obj);
         P param(data.argument);
         T* object = data.object;
         void (T::*function)(P) = data.function;
-
+        Thread<T,P>* thread =  (Thread<T,P>*)data.thread;
         delete &data;
+        
         (*object.*function)(param);
+        thread->exited = true;
         return 0;
     }
 };
