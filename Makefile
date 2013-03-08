@@ -92,6 +92,7 @@ obj/Client/CMSServerConnection.o : Client/CMSServerConnection.cpp  \
 		Util/Thread/Condition.h \
 		Util/Time/Time.h \
 		Util/Thread/ThreadLogger.h \
+		Util/Thread/SynchronisedQueue.h \
 		Util/Random/Sequential.h \
 		Client/CMSClient.h \
 		Protocol/CMSDestination/CMSDestination.h \
@@ -120,7 +121,8 @@ obj/Client/QueueReceiver.o : Client/QueueReceiver.cpp  \
 		Util/Thread/ReadWriteLock.h \
 		Util/Thread/Condition.h \
 		Util/Time/Time.h \
-		Util/Thread/ThreadLogger.h
+		Util/Thread/ThreadLogger.h \
+		Util/Thread/SynchronisedQueue.h
 	@mkdir -p obj/Client
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Client/QueueReceiver.cpp -o obj/Client/QueueReceiver.o
 
@@ -142,6 +144,7 @@ obj/Client/QueueSender.o : Client/QueueSender.cpp  \
 		Util/Thread/Condition.h \
 		Util/Time/Time.h \
 		Util/Thread/ThreadLogger.h \
+		Util/Thread/SynchronisedQueue.h \
 		Util/Random/Sequential.h \
 		Client/CMSClient.h \
 		Protocol/CMSDestination/CMSDestination.h \
@@ -167,6 +170,7 @@ obj/Client/TopicPublisher.o : Client/TopicPublisher.cpp  \
 		Util/Thread/Condition.h \
 		Util/Time/Time.h \
 		Util/Thread/ThreadLogger.h \
+		Util/Thread/SynchronisedQueue.h \
 		Util/Random/Sequential.h \
 		Client/CMSClient.h \
 		Protocol/CMSDestination/CMSDestination.h \
@@ -195,7 +199,8 @@ obj/Client/TopicSubscriber.o : Client/TopicSubscriber.cpp  \
 		Util/Thread/ReadWriteLock.h \
 		Util/Thread/Condition.h \
 		Util/Time/Time.h \
-		Util/Thread/ThreadLogger.h
+		Util/Thread/ThreadLogger.h \
+		Util/Thread/SynchronisedQueue.h
 	@mkdir -p obj/Client
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Client/TopicSubscriber.cpp -o obj/Client/TopicSubscriber.o
 
@@ -250,7 +255,10 @@ obj/main.o : main.cpp  \
 		Util/Thread/Condition.h \
 		Util/Time/Time.h \
 		Util/Thread/ThreadLogger.h \
+		Util/Thread/SynchronisedQueue.h \
 		Client/QueueSender.h \
+		Client/TopicSubscriber.h \
+		Client/TopicPublisher.h \
 		Util/Thread/ThreadLogger.h \
 		Util/Thread/Thread.h \
 		Util/String/StringUtils.h \
