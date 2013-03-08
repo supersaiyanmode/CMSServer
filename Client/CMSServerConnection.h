@@ -8,15 +8,14 @@
 #include "../Util/Thread/ReadWriteLock.h"
 #include "../Util/Thread/ThreadLogger.h"
 #include "../Util/Thread/Condition.h"
+#include "../Util/Thread/SynchronisedQueue.h"
 #include "../Util/Random/Sequential.h"
 #include "CMSClient.h"
 
 #include <map>
 
-struct ACKWaiter {
+struct ACKWaiter { //TODO: GIve a sensible name
     bool result;
-    Mutex* mutex;
-    Condition* condition;
     GenericCMSMessage ackMsg;
 };
 
@@ -54,8 +53,8 @@ class CMSServerConnection {
     
     
     //Wait stuff
-    std::map<UniqueID, ACKWaiter> waiters;
-    ReadWriteLock *waitersRWLock;
+    std::map<UniqueID, SynchronisedQueue<ACKWaiter>* > waiters;
+    Mutex *waitersLock; //No need for RWLock here, plain mutex will do.
     
     
     

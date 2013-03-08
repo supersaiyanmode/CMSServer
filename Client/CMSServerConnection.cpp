@@ -18,7 +18,7 @@ CMSServerConnection::CMSServerConnection(const std::string& ip, int p):
     writeLock = Mutex::createMutex();
     
     //Waiter
-    waitersRWLock = ReadWriteLock::createReadWriteLock();
+    waitersLock = Mutex::createMutex();
     
     //reader
     readerThread  = Thread<CMSServerConnection, int>::createThread(this, &CMSServerConnection::processIncomingMessages);
@@ -37,10 +37,9 @@ CMSServerConnection::~CMSServerConnection(){
     delete readerThread;
     
     resendThread->join();
-    
     delete resendThread;
-    delete sentDataRWLock;
     
+    delete sentDataRWLock;
     //destroy writer
     delete writeLock;
 }
@@ -55,13 +54,14 @@ void CMSServerConnection::close(){
     }
     
     //Singal ACKWaiter with result=false
-    waitersRWLock->lockRead();
-    for (std::map<UniqueID, ACKWaiter>::iterator it=waiters.begin(); it!=waiters.end(); it++){
-        it->second.result = false;
-        it->second.condition->signal();
+    waitersLock->acquire();
+    for (std::map<UniqueID, SynchronisedQueue<ACKWaiter>* >::iterator it=waiters.begin(); it!=waiters.end(); it++){
+        ACKWaiter msg;
+        msg.result = false;
+        it->second->push(msg);
     }
     //Dont clear the map, not needed. Waiters will erase their own entry by themselves.
-    waitersRWLock->unlockRead();
+    waitersLock->release();
     
     clientsMapRWLock->lockWrite();
     for (std::map<UniqueID, CMSClient*>::iterator it=clients.begin(); it!= clients.end(); it++)
@@ -78,7 +78,6 @@ void CMSServerConnection::close(){
     resendThread->kill();
     
     closed = true;
-    tlog("CMSServer Connection closed!");
 }
 
 bool CMSServerConnection::write_(GenericCMSMessage& msg,  bool wait) {
@@ -119,29 +118,26 @@ bool CMSServerConnection::writeWithAck(GenericCMSMessage& msg, GenericCMSMessage
     UniqueID id = Sequential::next();
     msg.updateStandardHeader("local-message-id", id);
     
-    Mutex* m = Mutex::createMutex();
-    Condition* c = Condition::createCondition(m);
-    ACKWaiter waiter = {false, m, c, GenericCMSMessage()};
+    SynchronisedQueue<ACKWaiter>* queue = SynchronisedQueue<ACKWaiter>::createSynchronisedQueue();
     
     //READ WRITE LOCK HERE!!!
-    waitersRWLock->lockWrite();
-    waiters[id] = waiter;
-    waitersRWLock->unlockWrite();
+    waitersLock->acquire();
+    waiters[id] = queue;
+    waitersLock->release();
     
+    ACKWaiter response;
     bool result = write_(msg, true);
-    if (result){
-        c->wait();
+    if (result){ //If write was success, we wait on queue.
+        response = queue->pop();
     }
-    delete c;   //Note: dont double delete using the pointers inside waiter
-    delete m;
+    delete queue; //Remember: Dont (double) delete from map entry.
     
-    waitersRWLock->lockWrite();
-    ACKWaiter ackWaiterNew = waiters[id];
+    waitersLock->acquire();
     waiters.erase(id);
-    waitersRWLock->unlockWrite();
+    waitersLock->release();
     
-    if (result && ackWaiterNew.result) //Need to check for ackWaiterNew.result: What is conn is closed while waiter for ACK?
-        out = ackWaiterNew.ackMsg;
+    if (result && response.result) //Need to check for ackWaiterNew.result: What if conn is closed while waiter for ACK?
+        out = response.ackMsg;
     
     return result;
 }
@@ -183,17 +179,14 @@ void CMSServerConnection::processIncomingMessages(int){
             bool topicOrQueue = out.category() == GenericCMSMessage::Queue ||
                     out.category() == GenericCMSMessage::Topic;
             
-            waitersRWLock->lockRead();
-            std::map<UniqueID, ACKWaiter>::iterator it = waiters.find(ackForMsgID);
+            waitersLock->acquire();
+            std::map<UniqueID, SynchronisedQueue<ACKWaiter>* >::iterator it = waiters.find(ackForMsgID);
             bool waiterFound = it != waiters.end();
-            waitersRWLock->unlockRead();
+            waitersLock->release();
 
             if (waiterFound) {
-                waitersRWLock->lockWrite(); //Bad "upgrade" from read to write, but fine since none else deletes
-                waiters[ackForMsgID].result = true;
-                waiters[ackForMsgID].ackMsg = out;
-                waiters[ackForMsgID].condition->signal();
-                waitersRWLock->unlockWrite();
+                ACKWaiter msg = {true, out};
+                it->second->push(msg);
             } else if (topicOrQueue) {
                 //Acknowledgement for Queue/Topic Message!!
                 if (receiver)
