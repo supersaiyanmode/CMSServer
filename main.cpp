@@ -16,10 +16,19 @@
 #include "Util/String/StringUtils.h"
 #include "Util/DataType/Primitive/Number.h"
 
+
+//TODO:
+//1. Move RegistrationData out to a new class with RWLocks
+//2. Like MessageProcessor, have BridgeProcessor as well
+
+
 class MyCMSServer: public CMSServer {
 	Thread<MyCMSServer, int>* thread;
 public:
     MyCMSServer(int p): CMSServer(p){
+        addBridge(CMSDestGroup("A.B.C.>"), CMSDestination("X.Y.Z"), true);
+        addBridge(CMSDestGroup("A.B.X.>"), CMSDestination("P.Q.R"), false);
+        
         thread = Thread<MyCMSServer, int>::createThread(this, &MyCMSServer::serve);
         thread->start(0);
     }
@@ -56,7 +65,7 @@ public:
     }
     
     void onMessage(GenericCMSMessage& msg){
-        tlog("Got:\n"<<msg.message());
+        tlog("Got ["<<(std::string)destination()<<"]: "<<msg.message());
     }
 };
 
@@ -80,7 +89,7 @@ public:
     }
     
     void onMessage(GenericCMSMessage& msg){
-        tlog("Got:\n"<<msg.message());
+        tlog("Got ["<<(std::string)destination()<<"]: "<<msg.message());
     }
 };
 

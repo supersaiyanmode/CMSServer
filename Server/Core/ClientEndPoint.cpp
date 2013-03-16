@@ -1,7 +1,7 @@
 #include "ClientEndPoint.h"
 #include "../../Util/Thread/ThreadLogger.h"
-ClientEndPoint::ClientEndPoint(Connection& c, MessageProcessor& mp): 
-                active(true), conn(c), messageProcessor(mp) {
+ClientEndPoint::ClientEndPoint(Connection& c, MessageProcessor& mp, BridgeProcessor& bp): 
+                active(true), conn(c), messageProcessor(mp), bridgeProcessor(bp) {
     queue = SynchronisedQueue<GenericCMSMessage>::createSynchronisedQueue();
     outThread = Thread<ClientEndPoint, int>::createThread(this, &ClientEndPoint::processOutgoing);
     outThread->start(0);
@@ -56,15 +56,23 @@ void ClientEndPoint::processIncoming(int){
             switch (msg.category()) {
 				//A Queue Message, from a QueueSender
                 case GenericCMSMessage::Queue: {
-                    resultStr = messageProcessor.processQueueMessage(msg)?
+                    bool result;
+                    resultStr = (result=messageProcessor.processQueueMessage(msg))?
                         "SUCCESS":"Error sending Queue Message";
+                    if (result) {
+                        bridgeProcessor.processMessage(msg, messageProcessor);
+                    }
                     break;
                 }
                 
 				//A topic Message, from a TopicSender
                 case GenericCMSMessage::Topic: {
-                    resultStr = messageProcessor.processTopicMessage(msg)?
+                    bool result;
+                    resultStr = (result=messageProcessor.processTopicMessage(msg))?
                         "SUCCESS":"Error sending Topic Message";
+                    if (result) {
+                        bridgeProcessor.processMessage(msg, messageProcessor);
+                    }
                     break;
                 }
 				
@@ -86,6 +94,7 @@ void ClientEndPoint::processIncoming(int){
                     break;
                 }
             }
+            
             if (resultStr == "SUCCESS")
                 ackMsg.updateStandardHeader("acknowledgement-result", "SUCCESS");
             else{

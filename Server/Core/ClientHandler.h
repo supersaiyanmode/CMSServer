@@ -3,10 +3,11 @@
 
 #include "../../Util/Server/ThreadingTCPServer.h"
 #include "MessageProcessor.h"
-
+#include "BridgeProcessor.h"
+    
 class ClientHandler : public ThreadingTCPServer {
 public:
-    ClientHandler(int, MessageProcessor&);
+    ClientHandler(int, MessageProcessor&, BridgeProcessor&);
     virtual ~ClientHandler();
     
     virtual void initialise();
@@ -19,6 +20,7 @@ protected:
     virtual void onDisconnection(const Connection&) const = 0;
 private:
 	MessageProcessor& messageProcessor;
+    BridgeProcessor& bridgeProcessor;
 };
 
 #endif

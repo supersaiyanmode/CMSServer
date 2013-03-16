@@ -4,17 +4,20 @@
 #include "Core/ClientHandler.h"
 #include "Core/MessageProcessor.h"
 
-class CMSServer : public MessageProcessor, public ClientHandler {
+class CMSServer : protected MessageProcessor, protected BridgeProcessor, public ClientHandler {
     bool destroyed;
-public:
-    CMSServer(int);
-    virtual ~CMSServer();
     
+protected:
     virtual bool onConnection(const Connection&) const;
     virtual void onDisconnection(const Connection&) const;
     virtual bool onReceiverRegistrationRequest();
     virtual bool onReceiverUnregistrationRequest();
     
+public:
+    CMSServer(int);
+    virtual ~CMSServer();
+    
+    std::string addBridge(const CMSDestGroup&, const CMSDestination&, bool isQueue);
     
     void destroy();
     
@@ -39,6 +42,10 @@ inline bool CMSServer::onReceiverRegistrationRequest() {
 
 inline bool CMSServer::onReceiverUnregistrationRequest() {
     return true;
+}
+
+inline std::string CMSServer::addBridge(const CMSDestGroup& from, const CMSDestination& to, bool isQueue) {
+    return BridgeProcessor::addBridge(from, to, isQueue);
 }
 
 #endif

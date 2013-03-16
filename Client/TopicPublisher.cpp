@@ -1,7 +1,7 @@
 #include "TopicPublisher.h"
 #include "../Util/Thread/ThreadLogger.h"
 
-TopicPublisher::TopicPublisher(CMSServerConnection& c, const std::string& d) :
+TopicPublisher::TopicPublisher(CMSServerConnection& c, const CMSDestination& d) :
             conn(c), destination(d){
         
 }

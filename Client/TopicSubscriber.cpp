@@ -3,8 +3,8 @@
 
 
 
-TopicSubscriber::TopicSubscriber(CMSServerConnection& c, const std::string& d):
-                    conn(c), cmsDestination(d){
+TopicSubscriber::TopicSubscriber(CMSServerConnection& c, const CMSDestGroup& d):
+                    conn(c), cmsDestGroup(d){
     conn.registerClient(this);
 }
 

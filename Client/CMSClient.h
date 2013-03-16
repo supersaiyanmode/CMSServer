@@ -2,7 +2,7 @@
 #define CMS_CLIENT_H
 
 #include "../Protocol/CMSMessage/GenericCMSMessage.h"
-#include "../Protocol/CMSDestination/CMSDestination.h"
+#include "../Protocol/CMSDestination/CMSDestGroup.h"
 #include "../Util/Random/Sequential.h"
 
 class CMSClient {
@@ -12,7 +12,7 @@ public:
     virtual ~CMSClient();
     
     UniqueID id() const;
-	virtual const CMSDestination& destination() const = 0;
+	virtual const CMSDestGroup& destination() const = 0;
     
     virtual void onAcknowledgement(UniqueID, GenericCMSMessage&) {}
     virtual void onError(UniqueID, GenericCMSMessage&) {}

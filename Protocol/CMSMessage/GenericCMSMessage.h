@@ -3,7 +3,8 @@
 
 #include "Header/CMSHeaderSet.h"
 #include "../../Util/IO/InputOutputCapable.h"
-
+#include "../CMSDestination/CMSDestination.h"
+#include "../CMSDestination/CMSDestGroup.h"
 
 
 class GenericCMSMessage: public Serialisable{
@@ -35,6 +36,7 @@ public:
     
     bool isForward() const;
     CMSMessageType category() const;
+    CMSDestGroup destination() const;
     
     std::string str();
     const std::string& message() const;
@@ -95,6 +97,10 @@ inline bool GenericCMSMessage::isForward() const {
 
 inline GenericCMSMessage::CMSMessageType GenericCMSMessage::category() const {
     return strToCMSMessageType(standardHeaders.get("category"));
+}
+
+inline CMSDestGroup GenericCMSMessage::destination() const {
+    return standardHeaders.get("destination");
 }
 
 inline const std::string& GenericCMSMessage::message() const {

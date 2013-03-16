@@ -3,8 +3,8 @@
 
 
 
-QueueReceiver::QueueReceiver(CMSServerConnection& c, const std::string& d):
-                    conn(c), cmsDestination(d){
+QueueReceiver::QueueReceiver(CMSServerConnection& c, const CMSDestGroup& d):
+                    conn(c), cmsDestGroup(d){
     conn.registerClient(this);
 }
 
