@@ -15,11 +15,20 @@
 #include "Util/Thread/Thread.h"
 #include "Util/String/StringUtils.h"
 #include "Util/DataType/Primitive/Number.h"
+#include "Util/OptParse/OptParse.h"
+
+//TODO:
+//1. Move RegistrationData out to a new class with RWLocks
+//2. Like MessageProcessor, have BridgeProcessor as well
+
 
 class MyCMSServer: public CMSServer {
 	Thread<MyCMSServer, int>* thread;
 public:
     MyCMSServer(int p): CMSServer(p){
+        addBridge(CMSDestGroup("A.B.C.>"), CMSDestination("X.Y.Z"), true);
+        addBridge(CMSDestGroup("A.B.X.>"), CMSDestination("P.Q.R"), false);
+        
         thread = Thread<MyCMSServer, int>::createThread(this, &MyCMSServer::serve);
         thread->start(0);
     }
@@ -56,7 +65,7 @@ public:
     }
     
     void onMessage(GenericCMSMessage& msg){
-        tlog("Got:\n"<<msg.message());
+        tlog("Got ["<<(std::string)destination()<<"]: "<<msg.message());
     }
 };
 
@@ -80,7 +89,7 @@ public:
     }
     
     void onMessage(GenericCMSMessage& msg){
-        tlog("Got:\n"<<msg.message());
+        tlog("Got ["<<(std::string)destination()<<"]: "<<msg.message());
     }
 };
 
@@ -96,15 +105,24 @@ public:
     }
 };
 
+OptParseData OPTPARSE_DATA[] = {
+    {"p", "port", "The port to bind on."},
+    {"s", "server", "<server-ip>:<port>"},
+    {"c", "conf", "The configuration file (optional)"}
+};
+
 int main(int argc, char ** argv){
-    if (argc != 3){
-        std::cout<<"Invalid arguments.\n";
+    OptParse parser(OPTPARSE_DATA, sizeof(OPTPARSE_DATA)/sizeof(*OPTPARSE_DATA));
+    if (!parser.parse(argc, argv)) {
+        std::cerr<<"Invalid command line arguments\n";
+        parser.displayHelp();
         return 1;
     }
-    if (std::string(argv[1]) == "-server") {
+    if (parser["port"] != "") {
         Number port(0);
-        if (!Number::parse(argv[2], port) || (long)port < 1024 || (long)port > 65535) {
+        if (!Number::parse(parser["port"], port) || (long)port < 1024 || (long)port > 65535) {
             std::cout<<"Not a valid port number.\n";
+            parser.displayHelp();
             return 1;
         }
         MyCMSServer server((int)(long)port);
@@ -118,14 +136,22 @@ int main(int argc, char ** argv){
             else
                 tlog("Unrecognised command.");
         }
-    } else {
+    } else if (parser["server"] != ""){
+        std::string serverStr = parser["server"];
+        std::vector<std::string> split = StringUtils::splitAny(serverStr, ":", true);
+        if (split.size() != 2) {
+            std::cerr<<"Invalid Server IP\n";
+            parser.displayHelp();
+            return 1;
+        }
         Number port(0);
-        if (!Number::parse(argv[2], port) || (long)port < 1024 || (long)port > 65535) {
+        if (!Number::parse(split[1], port) || (long)port < 1024 || (long)port > 65535) {
             std::cout<<"Not a valid port number.\n";
+            parser.displayHelp();
             return 1;
         }
         CMSServerConnection* conn = CMSServerConnection::createCMSServerConnection(
-            argv[1], (int)(long)port);
+            split[0], (int)(long)port);
         tlog ("Connected to Server at "<<argv[1]<<" on port "<<(long)port);
         std::vector<CMSClient*> receivers;
         std::string command, opt1, opt2;
@@ -161,6 +187,8 @@ int main(int argc, char ** argv){
             delete *it;
         }
         delete conn;
+    } else {
+        parser.displayHelp();
     }
     return 0;
 }
