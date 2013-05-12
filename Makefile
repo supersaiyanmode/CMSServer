@@ -19,11 +19,13 @@ UNITS= \
 		obj/Protocol/CMSDestination/CMSDestination.o\
 		obj/Protocol/CMSMessage/GenericCMSMessage.o\
 		obj/Protocol/CMSMessage/Header/CMSHeaderSet.o\
+		obj/Protocol/Exception/ProtocolException.o\
 		obj/Server/CMSServer.o\
 		obj/Server/Core/BridgeProcessor.o\
 		obj/Server/Core/ClientEndPoint.o\
 		obj/Server/Core/ClientHandler.o\
 		obj/Server/Core/MessageProcessor.o\
+		obj/Server/Core/MessageStore/GenericMessageStore.o\
 		obj/Util/DataType/BaseDataType.o\
 		obj/Util/DataType/Primitive/Float.o\
 		obj/Util/DataType/Primitive/Number.o\
@@ -299,7 +301,8 @@ obj/main.o : main.cpp  \
 		Util/String/StringUtils.h \
 		Util/DataType/Primitive/Number.h \
 		Util/DataType/BaseDataType.h \
-		Util/Serialisable/Serialisable.h
+		Util/Serialisable/Serialisable.h \
+		Util/OptParse/OptParse.h
 	@mkdir -p obj
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c main.cpp -o obj/main.o
 
@@ -307,7 +310,8 @@ obj/Protocol/CMSDestination/CMSDestGroup.o : Protocol/CMSDestination/CMSDestGrou
 		Protocol/CMSDestination/CMSDestination.h \
 		Util/Serialisable/Serialisable.h \
 		Protocol/CMSDestination/CMSDestGroup.h \
-		Util/String/StringUtils.h
+		Util/String/StringUtils.h \
+		Protocol/Exception/ProtocolException.h
 	@mkdir -p obj/Protocol/CMSDestination
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Protocol/CMSDestination/CMSDestGroup.cpp -o obj/Protocol/CMSDestination/CMSDestGroup.o
 
@@ -315,7 +319,8 @@ obj/Protocol/CMSDestination/CMSDestination.o : Protocol/CMSDestination/CMSDestin
 		Protocol/CMSDestination/CMSDestination.h \
 		Util/Serialisable/Serialisable.h \
 		Protocol/CMSDestination/CMSDestGroup.h \
-		Util/String/StringUtils.h
+		Util/String/StringUtils.h \
+		Protocol/Exception/ProtocolException.h
 	@mkdir -p obj/Protocol/CMSDestination
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Protocol/CMSDestination/CMSDestination.cpp -o obj/Protocol/CMSDestination/CMSDestination.o
 
@@ -344,6 +349,11 @@ obj/Protocol/CMSMessage/Header/CMSHeaderSet.o : Protocol/CMSMessage/Header/CMSHe
 		Util/String/StringUtils.h
 	@mkdir -p obj/Protocol/CMSMessage/Header
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Protocol/CMSMessage/Header/CMSHeaderSet.cpp -o obj/Protocol/CMSMessage/Header/CMSHeaderSet.o
+
+obj/Protocol/Exception/ProtocolException.o : Protocol/Exception/ProtocolException.cpp  \
+		Protocol/Exception/ProtocolException.h
+	@mkdir -p obj/Protocol/Exception
+	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Protocol/Exception/ProtocolException.cpp -o obj/Protocol/Exception/ProtocolException.o
 
 obj/Server/CMSServer.o : Server/CMSServer.cpp  \
 		Server/CMSServer.h \
@@ -518,6 +528,11 @@ obj/Server/Core/MessageProcessor.o : Server/Core/MessageProcessor.cpp  \
 		Util/Thread/ThreadLogger.h
 	@mkdir -p obj/Server/Core
 	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Server/Core/MessageProcessor.cpp -o obj/Server/Core/MessageProcessor.o
+
+obj/Server/Core/MessageStore/GenericMessageStore.o : Server/Core/MessageStore/GenericMessageStore.cpp  \
+		
+	@mkdir -p obj/Server/Core/MessageStore
+	$(CPPCOMPILER) $(COMPILEFLAGS) $(PREPROCESSORDEFINES) -c Server/Core/MessageStore/GenericMessageStore.cpp -o obj/Server/Core/MessageStore/GenericMessageStore.o
 
 obj/Util/DataType/BaseDataType.o : Util/DataType/BaseDataType.cpp  \
 		Util/DataType/BaseDataType.h \
