@@ -3,19 +3,19 @@
 
 #include "CMSClient.h"
 #include "CMSServerConnection.h"
-#include "../Protocol/CMSDestination/CMSDestination.h"
+#include "../Protocol/CMSDestination/CMSDestGroup.h"
 class TopicSubscriber : public CMSClient {
     CMSServerConnection& conn;
-    CMSDestination cmsDestination;
+    CMSDestGroup cmsDestGroup;
     
     
     TopicSubscriber(const TopicSubscriber&);
     TopicSubscriber& operator=(const TopicSubscriber&);
 protected:
-    TopicSubscriber(CMSServerConnection&, const std::string&);
+    TopicSubscriber(CMSServerConnection&, const CMSDestGroup&);
     virtual ~TopicSubscriber();
 
-	const CMSDestination& destination() const;
+	const CMSDestGroup& destination() const;
     
 public:
     virtual void onMessage(GenericCMSMessage&)=0;
@@ -25,8 +25,8 @@ public:
 
 //INLINE FUNCTIONS
 
-inline const CMSDestination& TopicSubscriber::destination() const {
-	return cmsDestination;
+inline const CMSDestGroup& TopicSubscriber::destination() const {
+	return cmsDestGroup;
 }
 
 #endif

@@ -13,7 +13,7 @@ class QueueSender {
     QueueSender& operator=(const QueueSender&);
     
 protected:
-    QueueSender(CMSServerConnection&, const std::string&);
+    QueueSender(CMSServerConnection&, const CMSDestination&);
     ~QueueSender();
     
     void onAcknowledgement(UniqueID, GenericCMSMessage&);

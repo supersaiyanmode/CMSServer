@@ -13,7 +13,7 @@ class TopicPublisher {
     TopicPublisher& operator=(const TopicPublisher&);
     
 protected:
-    TopicPublisher(CMSServerConnection&, const std::string&);
+    TopicPublisher(CMSServerConnection&, const CMSDestination&);
     ~TopicPublisher();
     
     void onAcknowledgement(UniqueID, GenericCMSMessage&);

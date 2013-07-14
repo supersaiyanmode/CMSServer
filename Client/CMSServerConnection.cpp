@@ -230,7 +230,7 @@ bool CMSServerConnection::doRegister(CMSClient* receiver, bool reg, GenericCMSMe
     chs["category"] = reg?
         GenericCMSMessage::CMSMessageTypeToStr(GenericCMSMessage::Register):
         GenericCMSMessage::CMSMessageTypeToStr(GenericCMSMessage::UnRegister);
-    chs["destination"] = receiver->destination();
+    chs["destination"] = receiver->destination(); //returns a DestGroup object.
     chs["has-custom-headers"] = "false";
     GenericCMSMessage msg(chs, custom, "");
     

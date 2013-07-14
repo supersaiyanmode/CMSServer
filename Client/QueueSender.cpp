@@ -1,7 +1,7 @@
 #include "QueueSender.h"
 #include "../Util/Thread/ThreadLogger.h"
 
-QueueSender::QueueSender(CMSServerConnection& c, const std::string& d) :
+QueueSender::QueueSender(CMSServerConnection& c, const CMSDestination& d) :
             conn(c), destination(d){
         
 }

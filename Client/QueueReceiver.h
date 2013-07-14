@@ -3,19 +3,19 @@
 
 #include "CMSClient.h"
 #include "CMSServerConnection.h"
-#include "../Protocol/CMSDestination/CMSDestination.h"
+#include "../Protocol/CMSDestination/CMSDestGroup.h"
 class QueueReceiver : public CMSClient {
     CMSServerConnection& conn;
-    CMSDestination cmsDestination;
+    CMSDestGroup cmsDestGroup;
     
     
     QueueReceiver(const QueueReceiver&);
     QueueReceiver& operator=(const QueueReceiver&);
 protected:
-    QueueReceiver(CMSServerConnection&, const std::string&);
+    QueueReceiver(CMSServerConnection&, const CMSDestGroup&);
     virtual ~QueueReceiver();
 
-	const CMSDestination& destination() const;
+	const CMSDestGroup& destination() const;
     
 public:
     virtual void onMessage(GenericCMSMessage&)=0;
@@ -25,8 +25,8 @@ public:
 
 //INLINE FUNCTIONS
 
-inline const CMSDestination& QueueReceiver::destination() const {
-	return cmsDestination;
+inline const CMSDestGroup& QueueReceiver::destination() const {
+	return cmsDestGroup;
 }
 
 #endif
