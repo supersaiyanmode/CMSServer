@@ -1,6 +1,6 @@
 #include "CMSServer.h"
 
-CMSServer::CMSServer(int p): ClientHandler(p, *this) {
+CMSServer::CMSServer(int p): ClientHandler(p, *this, *this) {
     destroyed = false;
     ClientHandler::initialise();
 }

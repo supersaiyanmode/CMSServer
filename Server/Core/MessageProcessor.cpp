@@ -119,16 +119,21 @@ void MessageProcessor::removeClient(ClientEndPoint* cep) {
     lock->unlockWrite();
 }
 
-bool MessageProcessor::processQueueMessage(GenericCMSMessage& msg) {
+bool MessageProcessor::processQueueMessage(GenericCMSMessage& msg, const CMSDestination& override) {
     tlog("[MessageProcessor] Processing Queue Request");
     
     //Acquire a Read lock for the entire Function: What if a regn is erased after finding?!
     
     lock->lockRead();
-    std::vector<std::vector<RegistrationData>::iterator> clients(findAll(NULL, "", msg.getStandardHeader("destination"),1));
+    CMSDestination dest = msg.getStandardHeader("destination");
+    if (override.valid())
+        dest = override;
+    //TODO: Change findAll parameter
+    std::vector<std::vector<RegistrationData>::iterator> clients(findAll(NULL, "", (std::string)dest,1));
     std::vector<RegistrationData>::iterator rdi;
     
-    //TODO: What is clients.size() == 0? Store to MessageStore!
+    if (!clients.size())
+        return false;
     rdi = *std::min_element(clients.begin(), clients.end(), RoundRobinComparator());
     
     rdi->lastServed = Time();
@@ -136,7 +141,6 @@ bool MessageProcessor::processQueueMessage(GenericCMSMessage& msg) {
     msg.updateStandardHeader("direction", "forward");
     msg.updateStandardHeader("global-message-id", Sequential::next()); //TODO: Acknowledgement mechanism!!
     msg.updateStandardHeader("receiver-id", rdi->receiverID);
-    msg.updateStandardHeader("destination", msg.getStandardHeader("destination"));
     msg.updateStandardHeader("category", GenericCMSMessage::CMSMessageTypeToStr(GenericCMSMessage::Queue));
     
     rdi->client->addOutboundMessage(msg);
@@ -145,20 +149,22 @@ bool MessageProcessor::processQueueMessage(GenericCMSMessage& msg) {
     return true;
 }
 
-bool MessageProcessor::processTopicMessage(GenericCMSMessage& msg) {
+bool MessageProcessor::processTopicMessage(GenericCMSMessage& msg, const CMSDestination& override) {
     tlog("[MessageProcessor] Processing Topic Request");
     
     //Acquire a Read lock for the entire Function: What if a regn is erased after finding?!
     lock->lockRead();
-    
-    std::vector<std::vector<RegistrationData>::iterator> clients(findAll(NULL, "", msg.getStandardHeader("destination"),1));
+    CMSDestination dest = msg.getStandardHeader("destination");
+    if (override.valid()) 
+        dest = override;
+    //TODO: change findAll Parameter;
+    std::vector<std::vector<RegistrationData>::iterator> clients(findAll(NULL, "", (std::string)dest,1));
     std::vector<std::vector<RegistrationData>::iterator>::iterator it = clients.begin();
     
     
     msg.updateStandardHeader("direction", "forward");
     msg.updateStandardHeader("global-message-id", Sequential::next()); //TODO: Acknowledgement mechanism!!
-    msg.updateStandardHeader("destination", msg.getStandardHeader("destination"));
-    msg.updateStandardHeader("category", GenericCMSMessage::CMSMessageTypeToStr(GenericCMSMessage::Topic));
+    msg.updateStandardHeader("category", GenericCMSMessage::CMSMessageTypeToStr(GenericCMSMessage::Topic));    
     
     for (; it != clients.end(); it++){
         msg.updateStandardHeader("receiver-id", (*it)->receiverID);

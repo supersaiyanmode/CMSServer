@@ -8,6 +8,8 @@
 #include "../../Util/Thread/ReadWriteLock.h"
 #include "../../Util/Time/Time.h"
 
+//TODO: Replace CMSDestination instead of std::string when using destinations.
+
 class ClientEndPoint;
 
 struct RegistrationData {
@@ -27,8 +29,8 @@ public:
     bool registerReceiver(ClientEndPoint*, const std::string& id, const std::string& dest);
     bool unregisterReceiver(ClientEndPoint*, const std::string& id);
 	
-    bool processQueueMessage(GenericCMSMessage&);
-    bool processTopicMessage(GenericCMSMessage&);
+    bool processQueueMessage(GenericCMSMessage&, const CMSDestination& = CMSDestination());
+    bool processTopicMessage(GenericCMSMessage&, const CMSDestination& = CMSDestination());
     
     void removeClient(ClientEndPoint*);
     

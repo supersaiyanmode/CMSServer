@@ -5,6 +5,7 @@
 #include <string>
 
 #include "MessageProcessor.h"
+#include "BridgeProcessor.h"
 #include "../../Util/IO/SocketIO/Connection.h"
 #include "../../Util/Thread/Thread.h"
 #include "../../Util/Thread/SynchronisedQueue.h"
@@ -12,7 +13,7 @@
 
 class ClientEndPoint {
 public:
-	ClientEndPoint(Connection &, MessageProcessor&);
+	ClientEndPoint(Connection &, MessageProcessor&, BridgeProcessor&);
 	~ClientEndPoint();
 	
 	
@@ -30,7 +31,7 @@ private:
 	
 	Connection& conn;
 	MessageProcessor& messageProcessor;
-    
+    BridgeProcessor& bridgeProcessor;
 };
 
 #endif

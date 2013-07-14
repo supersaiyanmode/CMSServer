@@ -22,13 +22,16 @@
 //2. Like MessageProcessor, have BridgeProcessor as well
 
 
+
+//TODO:
+//1. Move RegistrationData out to a new class with RWLocks
+//2. Like MessageProcessor, have BridgeProcessor as well
+
+
 class MyCMSServer: public CMSServer {
 	Thread<MyCMSServer, int>* thread;
 public:
     MyCMSServer(int p): CMSServer(p){
-        addBridge(CMSDestGroup("A.B.C.>"), CMSDestination("X.Y.Z"), true);
-        addBridge(CMSDestGroup("A.B.X.>"), CMSDestination("P.Q.R"), false);
-        
         thread = Thread<MyCMSServer, int>::createThread(this, &MyCMSServer::serve);
         thread->start(0);
     }
@@ -128,11 +131,15 @@ int main(int argc, char ** argv){
         MyCMSServer server((int)(long)port);
         tlog ("Server started on port "<<(long)port);
         std::string line;
-        while (std::getline(std::cin, line)){
+        while (std::cin>>line){
             if (line == "quit")
                 break;
-            else if (line == "")
-                continue;
+            else if (line=="bridge"){
+                std::string from, to;
+                int isQueue;
+                std::cin>>from>>to>>isQueue;
+                tlog("Bridge added: "<<server.addBridge(from, to, !!isQueue));
+            }
             else
                 tlog("Unrecognised command.");
         }
