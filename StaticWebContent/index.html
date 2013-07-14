@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+    <head>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+        <script>
+        var points;
+        
+        function loadPoint(point) {
+            console.log(point);
+            
+            var $form = $("#mainForm");
+            var $formInput = $("#divFormInput");
+            $formInput.empty();
+            var inputs = []
+            point.parameters.forEach(function(x) {
+                console.log(x);
+                var $input = $("<input/>", {type:"text"});
+                inputs.push({control: $input, parameterName: x.name});
+                var $wrapper = $("<p/>", {text: x.name}).append($input).append($("<span/>",{text:"(" + x.description + ")"}))
+                $formInput.append($wrapper);
+            });
+            
+            $form.submit(function(e) {
+                e.preventDefault();
+                
+                alert("Submitting.");
+                var postDataStr = "";
+                inputs.forEach(function(inputData){
+                    postDataStr += encodeURIComponent(inputData.control.val()) + "\n";
+                })
+                $.ajax({
+                    url: "/point?id=" + point.path,
+                    type: "post",
+                    data: postDataStr,
+                    success: function(response){
+                        alert(response);
+                    },
+                    error:function(){
+                        alert("failure");
+                    }   
+                });
+                
+                return false;
+            })
+            
+        }
+        $(function(){
+            $.ajax({
+                url: "/points",
+                type: "post",
+                data: "",
+                success: function(response){
+                    points = response;
+                    response.forEach(function(x){
+                        var $li = $("<li/>");
+                        var $a = $("<a/>", {text:x.path, href: "#"}).click(function(){
+                            loadPoint(x);
+                        });
+                        $li.append($a);
+                        $("#ulPointsList").append($li);
+                    });
+                },
+                error:function(){
+                    alert("failure");
+                }   
+            }); 
+        });
+        </script>
+        <title>Management Console</title>
+    </head>
+    <body>
+        <div>
+            <p>Available Points</p>
+            <ul id="ulPointsList">
+                
+            </ul>
+            <p>Main form</p>
+            <form id="mainForm" method="POST">
+                <div id="divFormInput">
+                    
+                </div>
+                <input type="submit" value="Invoke"/>
+            </form>
+        </div>
+    </body>
+</html>
