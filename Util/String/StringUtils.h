@@ -15,6 +15,9 @@ public:
                 bool = false);
     static std::vector<std::string> split(const std::string&, const std::string& = " \t\n\r",
                 bool = false);
+                
+    static std::string toLower(std::string);
+    static std::string toUpper(std::string);
 };
 
 

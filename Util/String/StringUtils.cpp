@@ -1,4 +1,6 @@
 #include "StringUtils.h"
+#include <cctype>
+#include <algorithm>
 
 std::string StringUtils::ltrim(const std::string& s, const std::string& trimChars){
     std::string ret(s);
@@ -44,4 +46,14 @@ std::vector<std::string> StringUtils::split(const std::string& str, const std::s
                     bool keepEmpty){
     std::vector<std::string> ret;
     return ret;
+}
+
+std::string StringUtils::toLower(std::string data) {
+    std::transform(data.begin(), data.end(), data.begin(), ::tolower);
+    return data;
+}
+
+std::string StringUtils::toUpper(std::string data) {
+    std::transform(data.begin(), data.end(), data.begin(), ::toupper);
+    return data;
 }
